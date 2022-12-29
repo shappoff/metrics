@@ -1,5 +1,7 @@
 import {default as React} from 'react';
 import {churchesMapping} from "./mapps";
+import IconInfo from '../icons/info-tooltip.svg';
+
 declare const bootstrap: any;
 const BornMetrics = ({hits,  churches, yearsFilter}: any) => {
 
@@ -19,6 +21,12 @@ ${churchesMapping.get(church)}
             console.error('Failed to copy: ', err);
         }
     }
+
+    React.useEffect(() => {
+        [].forEach.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'), (tooltipTriggerEl: any) => {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        })
+    }, []);
 
     return (
         <>
@@ -53,7 +61,9 @@ ${churchesMapping.get(church)}
                                     <td className="born-name-tr" dangerouslySetInnerHTML={{__html: _highlightResult?.name?.value}}></td>
                                     <td dangerouslySetInnerHTML={{__html: _highlightResult?.parants?.value}}></td>
                                     <td dangerouslySetInnerHTML={{__html: _highlightResult?.godparents?.value}}></td>
-                                    <td>{notes}</td>
+                                    <td className="note-info">{
+                                        notes ? <img src={IconInfo} alt={notes} title={notes} data-bs-toggle="tooltip" /> : null
+                                    }</td>
                                 </tr>
                             );
                         })

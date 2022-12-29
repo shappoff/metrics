@@ -1,5 +1,6 @@
 import {default as React} from 'react';
 import {churchesMapping} from "./mapps";
+import IconInfo from "../icons/info-tooltip.svg";
 
 declare const bootstrap: any;
 
@@ -20,6 +21,13 @@ ${reason ? `Причина смерти: ${reason}` : ''}
             console.error('Failed to copy: ', err);
         }
     }
+
+    React.useEffect(() => {
+        [].forEach.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'), (tooltipTriggerEl: any) => {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        })
+    }, []);
+
     return (
         <>
             <table className="table table-striped">
@@ -51,7 +59,9 @@ ${reason ? `Причина смерти: ${reason}` : ''}
                                 <td dangerouslySetInnerHTML={{__html: _highlightResult?.name?.value}}></td>
                                 <td>{age}</td>
                                 <td>{reason}</td>
-                                <td>{notes}</td>
+                                <td className="note-info">{
+                                    notes ? <img src={IconInfo} alt={notes} title={notes} data-bs-toggle="tooltip" /> : null
+                                }</td>
                             </tr>
                         );
                     })
