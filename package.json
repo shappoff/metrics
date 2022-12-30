@@ -1,7 +1,7 @@
 {
   "name": "belarus",
   "version": "1.0.0",
-  "description": "Населенные пункты и административное деление территоии Беларуси в разные времена",
+  "description": "Метрики",
   "main": "index.js",
   "scripts": {
     "dev:build": "env-cmd -e development webpack --mode development",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shappoff/belarus.git"
+    "url": "git+https://github.com/shappoff/metrics.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/shappoff/belarus/issues"
+    "url": "https://github.com/shappoff/metrics/issues"
   },
-  "homepage": "https://github.com/shappoff/belarus#readme",
+  "homepage": "https://github.com/shappoff/metrics#readme",
   "dependencies": {
     "algoliasearch": "^4.14.2",
     "firebase": "^7.24.0",
