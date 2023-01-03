@@ -26,7 +26,7 @@ ${churchesMapping.get(church)}
         [].forEach.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'), (tooltipTriggerEl: any) => {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         })
-    }, []);
+    }, [hits.length]);
 
     return (
         <>

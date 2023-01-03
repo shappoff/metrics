@@ -26,7 +26,7 @@ ${reason ? `Причина смерти: ${reason}` : ''}
         [].forEach.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'), (tooltipTriggerEl: any) => {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         })
-    }, []);
+    }, [hits.length]);
 
     return (
         <>
