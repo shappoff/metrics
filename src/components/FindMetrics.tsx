@@ -1,8 +1,6 @@
 import {CSSProperties, default as React} from 'react';
 import Select from 'react-select';
 
-import firebase from "firebase";
-
 const {
     applicationID, adminAPIKey
 } = env;
@@ -18,35 +16,46 @@ const client = algoliasearch(applicationID, adminAPIKey);
 export interface ItemOption {
     readonly value: string;
     readonly label: string;
+    readonly uezd: string;
 }
 
-export const sennenskiyUezd: readonly ItemOption[] = [
-    { value: 'molyavka', label: 'Молявковская Михайловская церковь'},
-    { value: 'sloveny', label: 'Словенинская Петропавловская церковь'},
-    { value: 'bobr', label: 'Бобрская святителя Николая церковь'},
+const listOfChurches: ItemOption[] = [
+    { value: 'molyavka', label: 'Молявковская Михайловская церковь', uezd: 'sennenskiy'},
+    { value: 'sloveny', label: 'Словенинская Петропавловская церковь', uezd: 'sennenskiy'},
+    { value: 'bobr', label: 'Бобрская святителя Николая церковь', uezd: 'sennenskiy'},
+    { value: 'nizgolovo', label: 'Низголовская Иоанно-Предчетинская церковь', uezd: 'lepelskiy' },
+    { value: 'usaya', label: 'Усайская Покрова Пресвятой Богородицы церковь', uezd: 'lepelskiy' },
+    { value: 'hotino', label: 'Хотинская Святого Иосифа Обручника церковь', uezd: 'lepelskiy' },
 ];
 
-export const lepelskiyUezd: readonly ItemOption[] = [
-    { value: 'nizgolovo', label: 'Низголовская Иоанно-Предчетинская церковь' },
-    { value: 'usaya', label: 'Усайская Покрова Пресвятой Богородицы церковь' },
-    { value: 'hotino', label: 'Хотинская Святого Иосифа Обручника церковь' },
-];
+const splitListOfChurches = (listOfChurches: Array<ItemOption>) => {
+    const lepelskiy: Array<ItemOption> = [];
+    const sennenskiy: Array<ItemOption> = [];
+    listOfChurches.forEach(({value, label, uezd}) => {
+        if (uezd === 'lepelskiy') {
+            lepelskiy.push({value, label, uezd});
+        }
+        if (uezd === 'sennenskiy') {
+            sennenskiy.push({value, label, uezd});
+        }
+    });
+    return [
+        {
+            label: 'Сенненский уезд',
+            options: sennenskiy
+        },
+        {
+            label: 'Лепельский уезд',
+            options: lepelskiy
+        }
+    ] as Array<GroupedOption>;
+};
 
 export interface GroupedOption {
     readonly label: string;
     readonly options: readonly ItemOption[];
 }
 
-export const groupedOptions: readonly GroupedOption[] = [
-    {
-        label: 'Сенненский уезд',
-        options: sennenskiyUezd,
-    },
-    {
-        label: 'Лепельский уезд',
-        options: lepelskiyUezd,
-    },
-];
 const groupStyles = {
     display: 'flex',
     alignItems: 'center',
@@ -144,9 +153,9 @@ const FindMetrics = () => {
     return (
         <>
             <Select<ItemOption, true, GroupedOption>
-                defaultValue={sennenskiyUezd[0]}
+                defaultValue={listOfChurches.filter(({uezd}: any) => uezd === 'sennenskiy')}
                 isMulti
-                options={groupedOptions}
+                options={splitListOfChurches(listOfChurches)}
                 formatGroupLabel={formatGroupLabel}
                 onChange={churchHandler}
             />
