@@ -84,7 +84,7 @@ const formatGroupLabel = (data: GroupedOption) => (
 const FindMetrics = () => {
     const [value, setValue] = React.useState<string>('');
     const [yearsFilter, setYearsFilter] = React.useState<Array<string>>([]);
-    const [churches, setChurches] = React.useState<Array<string>>(['molyavka']);
+    const [churches, setChurches] = React.useState<Array<string>>(listOfChurches.filter(({uezd}: any) => uezd === 'sennenskiy').map(({value}:any) => value));
     const [metricType, setMetricType] = React.useState<string>('born');
 
     const [hits, setHits] = React.useState<Array<any>>([]);
