@@ -8,6 +8,7 @@ const {
 import BornMetrics from "./BornMetrics";
 import MarriageMetrics from "./MarriageMetrics";
 import DiedMetrics from "./DiedMetrics";
+import useDebounce from "./useDebounce";
 
 const algoliasearch = require("algoliasearch");
 
@@ -82,7 +83,7 @@ const formatGroupLabel = (data: GroupedOption) => (
 );
 
 const FindMetrics = () => {
-    const [value, setValue] = React.useState<string>('');
+    const [searchTerm, setSearchTerm] = React.useState<string>('');
     const [yearsFilter, setYearsFilter] = React.useState<Array<string>>([]);
     const [churches, setChurches] = React.useState<Array<string>>(listOfChurches.filter(({uezd}: any) => uezd === 'sennenskiy').map(({value}:any) => value));
     const [metricType, setMetricType] = React.useState<string>('born');
@@ -91,17 +92,19 @@ const FindMetrics = () => {
     const [facets, setFacets] = React.useState<any>({});
     const [currentAlgoliaIndex, setCurrentAlgoliaIndex] = React.useState(client.initIndex('born'));
 
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
     React.useEffect(() => {
         setCurrentAlgoliaIndex(client.initIndex(metricType));
     }, [metricType]);
 
     const searchHandler = ({target}: any) => {
-        setValue(target.value);
+        setSearchTerm(target.value);
     }
 
     const keysHandler = (e: any) => {
         if (e.which == 27) {
-            setValue('');
+            setSearchTerm('');
             setHits([]);
         }
     };
@@ -131,16 +134,18 @@ const FindMetrics = () => {
     }, [churches]);
 
     React.useEffect(() => {
-        value.length && currentAlgoliaIndex.search(value, {
-            facetFilters: [
-                [...churches.map((year) => `church:${year}`)],
-                [...yearsFilter.map((year) => `year:${year}`)]
-            ]
-        })
-            .then(({hits, facets}: any) => {
-                setHits(hits);
-            });
-    }, [currentAlgoliaIndex, yearsFilter, value]);
+        if (debouncedSearchTerm) {
+            currentAlgoliaIndex.search(debouncedSearchTerm, {
+                facetFilters: [
+                    [...churches.map((year) => `church:${year}`)],
+                    [...yearsFilter.map((year) => `year:${year}`)]
+                ]
+            })
+                .then(({hits, facets}: any) => {
+                    setHits(hits);
+                });
+        }
+    }, [currentAlgoliaIndex, yearsFilter, debouncedSearchTerm]);
 
     const yearClickHandler = (e: any) => {
         if (e.target.checked) {
@@ -188,7 +193,7 @@ const FindMetrics = () => {
                     )
                 }
             </div>
-            <input autoFocus onInput={searchHandler} onChange={keysHandler} type="text" value={value} id="input"/>
+            <input autoFocus onInput={searchHandler} onChange={keysHandler} type="text" value={searchTerm} id="input"/>
             {
                 hits.length && metricType === 'born' ? <BornMetrics hits={hits} churches={churches} yearsFilter={yearsFilter} /> : ''
             }
