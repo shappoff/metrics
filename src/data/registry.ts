@@ -1,7 +1,7 @@
 import type { SheetRow } from "@/lib/google/types";
-import { birthsConfig } from "./sources/births/config";
+import { birthsConfig } from "@/data/sources/births";
 import { parseBirthRows } from "./sources/births/parse";
-import type { BirthRecord } from "./sources/births/schema";
+import type { BirthRecord } from "@/data/sources/births";
 
 export type DataSource<TRow> = {
   id: string;
