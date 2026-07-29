@@ -115,14 +115,14 @@ export default async function PageView({ params }: Props) {
     <main>
       <Breadcrumbs
         items={[
-          { href: "/", label: "Фонды" },
+          { href: "/", label: "НИАБ" },
           { href: fundPath(fund), label: `Фонд ${fund}` },
           { href: inventoryPath(fund, inventory), label: `Опись ${inventory}` },
           {
             href: casePath(fund, inventory, caseNumber),
             label: `Дело ${caseNumber}`,
           },
-          { label: `Стр. ${pageNum}` },
+          { label: `лл. ${pageNum}` },
         ]}
       />
       <h1>
@@ -135,7 +135,7 @@ export default async function PageView({ params }: Props) {
         nextHref={
           next ? pagePath(fund, inventory, caseNumber, next) : null
         }
-        currentLabel={`Страница ${pageNum} из ${pages.length}`}
+        currentLabel={`лл. ${pageNum} из ${pages.length}`}
       />
       <BirthRecords records={pageRecords} />
     </main>

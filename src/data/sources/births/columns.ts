@@ -2,7 +2,7 @@ import type { BirthRecord } from "./schema";
 
 export const BIRTH_VISIBLE_COLUMNS = [
   { key: "fod", label: "Фонд-Опись-Дело" },
-  { key: "page", label: "Страница" },
+  { key: "page", label: "лл." },
   { key: "m", label: "М" },
   { key: "f", label: "Ж" },
   { key: "year", label: "Год" },

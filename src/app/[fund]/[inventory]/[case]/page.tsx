@@ -64,7 +64,7 @@ export default async function CasePage({ params }: Props) {
     <main>
       <Breadcrumbs
         items={[
-          { href: "/", label: "Фонды" },
+          { href: "/", label: "НИАБ" },
           { href: fundPath(fund), label: `Фонд ${fund}` },
           { href: inventoryPath(fund, inventory), label: `Опись ${inventory}` },
           { label: `Дело ${caseNumber}` },
@@ -77,7 +77,7 @@ export default async function CasePage({ params }: Props) {
       <LinkList
         items={pages.map((page) => ({
           href: pagePath(fund, inventory, caseNumber, page),
-          label: `Страница ${page}`,
+          label: `лл. ${page}`,
         }))}
         emptyText="В этом деле нет страниц"
       />

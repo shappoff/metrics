@@ -47,7 +47,7 @@ export default async function InventoryPage({ params }: Props) {
     <main>
       <Breadcrumbs
         items={[
-          { href: "/", label: "Фонды" },
+          { href: "/", label: "НИАБ" },
           { href: fundPath(fund), label: `Фонд ${fund}` },
           { label: `Опись ${inventory}` },
         ]}

@@ -8,11 +8,8 @@ export default async function HomePage() {
 
   return (
     <main>
-      <Breadcrumbs items={[{ label: "Фонды" }]} />
+      <Breadcrumbs items={[{ label: "НИАБ" }]} />
       <h1>Фонды</h1>
-      <p className="empty" style={{ marginBottom: "1rem" }}>
-        О рождениях — выберите фонд
-      </p>
       <LinkList
         items={funds.map((fund) => ({
           href: fundPath(fund),

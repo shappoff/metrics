@@ -33,7 +33,7 @@ export default async function FundPage({ params }: Props) {
     <main>
       <Breadcrumbs
         items={[
-          { href: "/", label: "Фонды" },
+          { href: "/", label: "НИАБ" },
           { label: `Фонд ${fund}` },
         ]}
       />
