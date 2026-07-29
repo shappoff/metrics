@@ -128,21 +128,22 @@ export default async function PageView({ params }: Props) {
             href: casePath(fund, inventory, caseNumber),
             label: `Дело ${caseNumber}`,
           },
-          { label: `лл. ${pageNum}` },
         ]}
+        trailing={
+          <PagePager
+            prevHref={
+              prev ? pagePath(fund, inventory, caseNumber, prev) : null
+            }
+            nextHref={
+              next ? pagePath(fund, inventory, caseNumber, next) : null
+            }
+            currentLabel={`лл. ${pageNum} из ${total}`}
+          />
+        }
       />
       <h1>
         Фонд {fund}, опись {inventory}, дело {caseNumber}
       </h1>
-      <PagePager
-        prevHref={
-          prev ? pagePath(fund, inventory, caseNumber, prev) : null
-        }
-        nextHref={
-          next ? pagePath(fund, inventory, caseNumber, next) : null
-        }
-        currentLabel={`лл. ${pageNum} из ${total}`}
-      />
       {pageRecords.births.length > 0 || pageRecords.birthsExtra.length > 0 ? (
         <>
           <h2>Рождения</h2>

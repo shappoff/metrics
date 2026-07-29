@@ -8,18 +8,24 @@ type Props = {
 
 export function PagePager({ prevHref, nextHref, currentLabel }: Props) {
   return (
-    <div className="pager">
+    <nav className="pager" aria-label="Страницы">
       {prevHref ? (
         <Link href={prevHref}>← Предыдущая</Link>
       ) : (
-        <span className="current">← Предыдущая</span>
+        <span className="current" aria-disabled="true">
+          ← Предыдущая
+        </span>
       )}
-      <span className="current">{currentLabel}</span>
+      <span className="current" aria-current="page">
+        {currentLabel}
+      </span>
       {nextHref ? (
         <Link href={nextHref}>Следующая →</Link>
       ) : (
-        <span className="current">Следующая →</span>
+        <span className="current" aria-disabled="true">
+          Следующая →
+        </span>
       )}
-    </div>
+    </nav>
   );
 }
