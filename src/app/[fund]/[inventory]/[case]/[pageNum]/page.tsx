@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { BirthRecords } from "@/components/BirthRecords";
+import { BirthExtraRecords } from "@/components/BirthExtraRecords";
 import { DeathRecords } from "@/components/DeathRecords";
 import { MarriageRecords } from "@/components/MarriageRecords";
 import { PagePager } from "@/components/PagePager";
@@ -140,10 +141,15 @@ export default async function PageView({ params }: Props) {
         }
         currentLabel={`лл. ${pageNum} из ${total}`}
       />
-      {pageRecords.births.length > 0 ? (
+      {pageRecords.births.length > 0 || pageRecords.birthsExtra.length > 0 ? (
         <>
           <h2>Рождения</h2>
-          <BirthRecords records={pageRecords.births} />
+          {pageRecords.births.length > 0 ? (
+            <BirthRecords records={pageRecords.births} />
+          ) : null}
+          {pageRecords.birthsExtra.length > 0 ? (
+            <BirthExtraRecords records={pageRecords.birthsExtra} />
+          ) : null}
         </>
       ) : null}
       {pageRecords.marriages.length > 0 ? (
@@ -159,6 +165,7 @@ export default async function PageView({ params }: Props) {
         </>
       ) : null}
       {pageRecords.births.length === 0 &&
+      pageRecords.birthsExtra.length === 0 &&
       pageRecords.marriages.length === 0 &&
       pageRecords.deaths.length === 0 ? (
         <p className="empty">На этой странице нет записей</p>

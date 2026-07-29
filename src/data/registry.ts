@@ -8,6 +8,9 @@ import type { DeathRecord } from "@/data/sources/deaths";
 import { marriagesConfig } from "@/data/sources/marriages";
 import { parseMarriageRows } from "./sources/marriages/parse";
 import type { MarriageRecord } from "@/data/sources/marriages";
+import { birthsExtraConfig } from "@/data/sources/births_extra";
+import { parseBirthExtraRows } from "./sources/births_extra/parse";
+import type { BirthExtraRecord } from "@/data/sources/births_extra";
 
 export type DataSource<TRow> = {
   id: string;
@@ -41,8 +44,21 @@ export const deathsSource: DataSource<DeathRecord> = {
   parseRows: parseDeathRows,
 };
 
+export const birthsExtraSource: DataSource<BirthExtraRecord> = {
+  id: birthsExtraConfig.id,
+  title: birthsExtraConfig.title,
+  spreadsheetId: birthsExtraConfig.spreadsheetId,
+  sheetName: birthsExtraConfig.sheetName,
+  parseRows: parseBirthExtraRows,
+};
+
 /** Registry of all sheet sources. Add a new source here when extending. */
-export const dataSources = [birthsSource, marriagesSource, deathsSource] as const;
+export const dataSources = [
+  birthsSource,
+  birthsExtraSource,
+  marriagesSource,
+  deathsSource,
+] as const;
 
 export function getDataSource(id: string) {
   return dataSources.find((source) => source.id === id);

@@ -2,6 +2,10 @@ import { type BirthRecord, loadBirthRecords } from "@/data/sources/births";
 import { type DeathRecord, loadDeathRecords } from "@/data/sources/deaths";
 import { type MarriageRecord, loadMarriageRecords } from "@/data/sources/marriages";
 import {
+  type BirthExtraRecord,
+  loadBirthExtraRecords,
+} from "@/data/sources/births_extra";
+import {
   getAdjacentPages,
   listCasesForInventory,
   listFunds,
@@ -25,10 +29,20 @@ type ScopedDeathRecord = RouteRecord & {
   record: DeathRecord;
 };
 
-type ScopedRecord = ScopedBirthRecord | ScopedMarriageRecord | ScopedDeathRecord;
+type ScopedBirthExtraRecord = RouteRecord & {
+  source: "births_extra";
+  record: BirthExtraRecord;
+};
+
+type ScopedRecord =
+  | ScopedBirthRecord
+  | ScopedMarriageRecord
+  | ScopedDeathRecord
+  | ScopedBirthExtraRecord;
 
 type CombinedRecords = {
   births: BirthRecord[];
+  birthsExtra: BirthExtraRecord[];
   marriages: MarriageRecord[];
   deaths: DeathRecord[];
   scoped: ScopedRecord[];
@@ -70,22 +84,41 @@ function withDeathScope(records: DeathRecord[]): ScopedDeathRecord[] {
   }));
 }
 
+function withBirthExtraScope(
+  records: BirthExtraRecord[],
+): ScopedBirthExtraRecord[] {
+  return records.map((record) => ({
+    source: "births_extra",
+    record,
+    fund: record.fund,
+    inventory: record.inventory,
+    caseNumber: record.caseNumber,
+    page: record.page,
+  }));
+}
+
+function compareNatural(a: string, b: string): number {
+  return a.localeCompare(b, "ru", { numeric: true, sensitivity: "base" });
+}
+
 export async function loadCombinedRecords(): Promise<CombinedRecords> {
   if (cachedCombined) return cachedCombined;
   if (loadPromise) return loadPromise;
 
   loadPromise = Promise.all([
     loadBirthRecords(),
+    loadBirthExtraRecords(),
     loadMarriageRecords(),
     loadDeathRecords(),
-  ])
-    .then(([births, marriages, deaths]) => {
+  ]).then(([births, birthsExtra, marriages, deaths]) => {
       cachedCombined = {
         births,
+        birthsExtra,
         marriages,
         deaths,
         scoped: [
           ...withBirthScope(births),
+          ...withBirthExtraScope(birthsExtra),
           ...withMarriageScope(marriages),
           ...withDeathScope(deaths),
         ],
@@ -134,11 +167,13 @@ export async function getCombinedPageRecords(
   page: string,
 ): Promise<{
   births: BirthRecord[];
+  birthsExtra: BirthExtraRecord[];
   marriages: MarriageRecord[];
   deaths: DeathRecord[];
 }> {
   const { scoped } = await loadCombinedRecords();
   const births: BirthRecord[] = [];
+  const birthsExtra: BirthExtraRecord[] = [];
   const marriages: MarriageRecord[] = [];
   const deaths: DeathRecord[] = [];
 
@@ -153,11 +188,18 @@ export async function getCombinedPageRecords(
     }
 
     if (entry.source === "births") births.push(entry.record);
+    if (entry.source === "births_extra") birthsExtra.push(entry.record);
     if (entry.source === "marriages") marriages.push(entry.record);
     if (entry.source === "deaths") deaths.push(entry.record);
   }
 
-  return { births, marriages, deaths };
+  // Ensure deterministic ordering before rendering.
+  births.sort((a, b) => compareNatural(a.fod, b.fod));
+  birthsExtra.sort((a, b) => compareNatural(a.fod, b.fod));
+  marriages.sort((a, b) => compareNatural(a.fod, b.fod));
+  deaths.sort((a, b) => compareNatural(a.fod, b.fod));
+
+  return { births, birthsExtra, marriages, deaths };
 }
 
 export async function getCombinedAdjacentPages(
