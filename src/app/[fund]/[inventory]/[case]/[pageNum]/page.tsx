@@ -1,15 +1,20 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { BirthRecords } from "@/components/BirthRecords";
 import { PagePager } from "@/components/PagePager";
 import {
+  casePath,
+  fundPath,
   getAdjacentPages,
   getRecordsForPage,
+  inventoryPath,
   listCasesForInventory,
   listFunds,
   listInventoriesForFund,
   listPagesForCase,
   loadBirthRecords,
+  normalizePageRouteSegment,
+  pagePath,
 } from "@/data/sources/births";
 
 type Props = {
@@ -47,7 +52,7 @@ export async function generateStaticParams() {
             fund,
             inventory,
             case: caseNumber,
-            pageNum: page,
+            pageNum: normalizePageRouteSegment(page),
           });
         }
       }
@@ -67,7 +72,8 @@ export default async function PageView({ params }: Props) {
   const fund = decodeURIComponent(fundParam);
   const inventory = decodeURIComponent(inventoryParam);
   const caseNumber = decodeURIComponent(caseParam);
-  const pageNum = decodeURIComponent(pageParam);
+  const rawPageNum = decodeURIComponent(pageParam);
+  const normalizedPageNum = normalizePageRouteSegment(rawPageNum);
   const records = await loadBirthRecords();
 
   if (!listFunds(records).includes(fund)) {
@@ -83,8 +89,17 @@ export default async function PageView({ params }: Props) {
   }
 
   const pages = listPagesForCase(records, fund, inventory, caseNumber);
-  if (!pages.includes(pageNum)) {
+  const pageNum = pages.find(
+    (page) => normalizePageRouteSegment(page) === normalizedPageNum,
+  );
+
+  if (!pageNum) {
     notFound();
+  }
+
+  const canonicalPath = pagePath(fund, inventory, caseNumber, pageNum);
+  if (pageParam !== encodeURIComponent(normalizedPageNum)) {
+    redirect(canonicalPath);
   }
 
   const pageRecords = getRecordsForPage(
@@ -96,17 +111,17 @@ export default async function PageView({ params }: Props) {
   );
   const { prev, next } = getAdjacentPages(pages, pageNum);
 
-  const inventoryBase = `/births/${encodeURIComponent(fund)}/${encodeURIComponent(inventory)}`;
-  const caseBase = `${inventoryBase}/${encodeURIComponent(caseNumber)}`;
-
   return (
     <main>
       <Breadcrumbs
         items={[
           { href: "/", label: "Фонды" },
-          { href: `/births/${encodeURIComponent(fund)}/`, label: `Фонд ${fund}` },
-          { href: `${inventoryBase}/`, label: `Опись ${inventory}` },
-          { href: `${caseBase}/`, label: `Дело ${caseNumber}` },
+          { href: fundPath(fund), label: `Фонд ${fund}` },
+          { href: inventoryPath(fund, inventory), label: `Опись ${inventory}` },
+          {
+            href: casePath(fund, inventory, caseNumber),
+            label: `Дело ${caseNumber}`,
+          },
           { label: `Стр. ${pageNum}` },
         ]}
       />
@@ -114,8 +129,12 @@ export default async function PageView({ params }: Props) {
         Фонд {fund}, опись {inventory}, дело {caseNumber}
       </h1>
       <PagePager
-        prevHref={prev ? `${caseBase}/${encodeURIComponent(prev)}/` : null}
-        nextHref={next ? `${caseBase}/${encodeURIComponent(next)}/` : null}
+        prevHref={
+          prev ? pagePath(fund, inventory, caseNumber, prev) : null
+        }
+        nextHref={
+          next ? pagePath(fund, inventory, caseNumber, next) : null
+        }
         currentLabel={`Страница ${pageNum} из ${pages.length}`}
       />
       <BirthRecords records={pageRecords} />

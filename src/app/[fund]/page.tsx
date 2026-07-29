@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { LinkList } from "@/components/LinkList";
 import {
+  inventoryPath,
   listFunds,
   listInventoriesForFund,
   loadBirthRecords,
@@ -40,7 +41,7 @@ export default async function FundPage({ params }: Props) {
       <h2>Описи</h2>
       <LinkList
         items={inventories.map((inventory) => ({
-          href: `/births/${encodeURIComponent(fund)}/${encodeURIComponent(inventory)}/`,
+          href: inventoryPath(fund, inventory),
           label: `Опись ${inventory}`,
         }))}
         emptyText="В этом фонде нет описей"

@@ -35,4 +35,11 @@ export {
   getRecordsForPage,
   getAdjacentPages,
 } from "./hierarchy";
+export {
+  fundPath,
+  inventoryPath,
+  casePath,
+  pagePath,
+  normalizePageRouteSegment,
+} from "./paths";
 export type { BirthRecord } from "./schema";

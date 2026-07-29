@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { LinkList } from "@/components/LinkList";
 import {
+  casePath,
+  fundPath,
   listCasesForInventory,
   listFunds,
   listInventoriesForFund,
@@ -40,14 +42,13 @@ export default async function InventoryPage({ params }: Props) {
   }
 
   const cases = listCasesForInventory(records, fund, inventory);
-  const base = `/births/${encodeURIComponent(fund)}/${encodeURIComponent(inventory)}`;
 
   return (
     <main>
       <Breadcrumbs
         items={[
           { href: "/", label: "Фонды" },
-          { href: `/births/${encodeURIComponent(fund)}/`, label: `Фонд ${fund}` },
+          { href: fundPath(fund), label: `Фонд ${fund}` },
           { label: `Опись ${inventory}` },
         ]}
       />
@@ -57,7 +58,7 @@ export default async function InventoryPage({ params }: Props) {
       <h2>Дела</h2>
       <LinkList
         items={cases.map((caseNumber) => ({
-          href: `${base}/${encodeURIComponent(caseNumber)}/`,
+          href: casePath(fund, inventory, caseNumber),
           label: `Дело ${caseNumber}`,
         }))}
         emptyText="В этой описи нет дел"
