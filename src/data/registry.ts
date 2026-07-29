@@ -9,10 +9,10 @@ import { marriagesConfig } from "@/data/sources/marriages";
 import { parseMarriageRows } from "./sources/marriages/parse";
 import type { MarriageRecord } from "@/data/sources/marriages";
 import { marriagesAltConfig } from "@/data/sources/marriages_alt";
-import { parseMarriageAltRows } from "./sources/marriages_alt/parse";
+import { parseMarriageAltRows } from "@/data/sources/marriages_alt";
 import type { MarriageAltRecord } from "@/data/sources/marriages_alt";
 import { birthsExtraConfig } from "@/data/sources/births_extra";
-import { parseBirthExtraRows } from "./sources/births_extra/parse";
+import { parseBirthExtraRows } from "@/data/sources/births_extra";
 import type { BirthExtraRecord } from "@/data/sources/births_extra";
 
 export type DataSource<TRow> = {
