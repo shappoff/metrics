@@ -1,42 +1,41 @@
 import type { SheetRow } from "@/lib/google/types";
 import { parseFod } from "../shared/parse-fod";
+import { createPageReader } from "../shared/sheet-row-reader";
 import { shouldSkipRowByChurch } from "../shared/skip-row";
 import { birthExtraRecordSchema, type BirthExtraRecord } from "./schema";
 
-function pick(row: SheetRow, key: string): string {
-  return (row[key] ?? "").trim();
-}
-
 export function parseBirthExtraRows(rows: SheetRow[]): BirthExtraRecord[] {
   const records: BirthExtraRecord[] = [];
+  const pageReader = createPageReader();
 
   for (const row of rows) {
-    const fod = pick(row, "fod");
+    const page = pageReader.readPage(row);
+    const fod = pageReader.pick(row, "fod");
     const parsed = parseFod(fod);
     if (!parsed) continue;
-    if (shouldSkipRowByChurch(pick(row, "church"))) continue;
-
-    const page = pick(row, "page") || "—";
+    if (shouldSkipRowByChurch(pageReader.pick(row, "church"))) continue;
 
     const candidate = {
       fod,
       page,
-      m: pick(row, "m"),
-      f: pick(row, "f"),
-      born: pick(row, "born"),
-      baptism: pick(row, "baptism"),
+      m: pageReader.pick(row, "m"),
+      f: pageReader.pick(row, "f"),
+      born: pageReader.pick(row, "born"),
+      baptism: pageReader.pick(row, "baptism"),
 
-      whoWhereWhen: pick(row, "whoWhereWhen"),
-      note_WWW: pick(row, "note_WWW"),
+      whoWhereWhen: pageReader.pick(row, "whoWhereWhen"),
+      note_WWW: pageReader.pick(row, "note_WWW"),
 
-      parents: pick(row, "parents"),
-      parants_note: pick(row, "parants_note") || pick(row, "parents_note"),
+      parents: pageReader.pick(row, "parents"),
+      parants_note:
+        pageReader.pick(row, "parants_note") ||
+        pageReader.pick(row, "parents_note"),
 
-      godparents: pick(row, "godparents"),
-      godparents_note: pick(row, "godparents_note"),
+      godparents: pageReader.pick(row, "godparents"),
+      godparents_note: pageReader.pick(row, "godparents_note"),
 
-      notes: pick(row, "notes"),
-      church: pick(row, "church"),
+      notes: pageReader.pick(row, "notes"),
+      church: pageReader.pick(row, "church"),
 
       fund: parsed.fund,
       inventory: parsed.inventory,

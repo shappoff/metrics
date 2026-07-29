@@ -1,41 +1,38 @@
 import type { SheetRow } from "@/lib/google/types";
 import { parseFod } from "../shared/parse-fod";
+import { createPageReader } from "../shared/sheet-row-reader";
 import { shouldSkipRowByChurch } from "../shared/skip-row";
 import { marriageRecordSchema, type MarriageRecord } from "./schema";
 
-function pick(row: SheetRow, key: string): string {
-  return (row[key] ?? "").trim();
-}
-
 export function parseMarriageRows(rows: SheetRow[]): MarriageRecord[] {
   const records: MarriageRecord[] = [];
+  const pageReader = createPageReader();
 
   for (const row of rows) {
-    const fod = pick(row, "fod");
+    const page = pageReader.readPage(row);
+    const fod = pageReader.pick(row, "fod");
     const parsed = parseFod(fod);
     if (!parsed) continue;
-    if (shouldSkipRowByChurch(pick(row, "church"))) continue;
-
-    const page = pick(row, "page") || "—";
+    if (shouldSkipRowByChurch(pageReader.pick(row, "church"))) continue;
 
     const candidate = {
       fod,
       page,
-      year: pick(row, "year"),
-      month: pick(row, "month"),
-      "№": pick(row, "№"),
-      day: pick(row, "day"),
-      husband: pick(row, "husband"),
-      husband_age: pick(row, "husband_age"),
-      husband_note: pick(row, "husband_note"),
-      wife: pick(row, "wife"),
-      wife_age: pick(row, "wife_age"),
-      wife_note: pick(row, "wife_note"),
-      trustees: pick(row, "trustees"),
-      trustees_note: pick(row, "trustees_note"),
-      notes: pick(row, "notes"),
-      priest: pick(row, "priest"),
-      church: pick(row, "church"),
+      year: pageReader.pick(row, "year"),
+      month: pageReader.pick(row, "month"),
+      "№": pageReader.pick(row, "№"),
+      day: pageReader.pick(row, "day"),
+      husband: pageReader.pick(row, "husband"),
+      husband_age: pageReader.pick(row, "husband_age"),
+      husband_note: pageReader.pick(row, "husband_note"),
+      wife: pageReader.pick(row, "wife"),
+      wife_age: pageReader.pick(row, "wife_age"),
+      wife_note: pageReader.pick(row, "wife_note"),
+      trustees: pageReader.pick(row, "trustees"),
+      trustees_note: pageReader.pick(row, "trustees_note"),
+      notes: pageReader.pick(row, "notes"),
+      priest: pageReader.pick(row, "priest"),
+      church: pageReader.pick(row, "church"),
       fund: parsed.fund,
       inventory: parsed.inventory,
       caseNumber: parsed.caseNumber,
