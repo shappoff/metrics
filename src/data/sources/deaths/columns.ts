@@ -1,17 +1,22 @@
 import type { DeathRecord } from "./schema";
-import {
-  CIPHER_COLUMN,
-  type VisibleColumn,
-} from "../shared/cipher-column";
+import { CIPHER_COLUMN } from "../shared/cipher-column";
+import { archiveDateColumn } from "../shared/date-column";
+import type { VisibleColumn } from "../shared/visible-column";
 
 export const DEATH_VISIBLE_COLUMNS = [
   CIPHER_COLUMN,
-  { key: "year", label: "Год" },
-  { key: "month", label: "Месяц" },
   { key: "m", label: "М" },
   { key: "f", label: "Ж" },
-  { key: "died", label: "Умер" },
-  { key: "buried", label: "Погребен" },
+  archiveDateColumn<DeathRecord>({
+    key: "died",
+    label: "Умер",
+    getDay: (record) => record.died,
+  }),
+  archiveDateColumn<DeathRecord>({
+    key: "buried",
+    label: "Погребен",
+    getDay: (record) => record.buried,
+  }),
   { key: "name", label: "Имя" },
   { key: "age", label: "Возраст" },
   { key: "name_note", label: "Примечание (имя)" },

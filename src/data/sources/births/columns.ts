@@ -1,17 +1,22 @@
 import type { BirthRecord } from "./schema";
-import {
-  CIPHER_COLUMN,
-  type VisibleColumn,
-} from "../shared/cipher-column";
+import { CIPHER_COLUMN } from "../shared/cipher-column";
+import { archiveDateColumn } from "../shared/date-column";
+import type { VisibleColumn } from "../shared/visible-column";
 
 export const BIRTH_VISIBLE_COLUMNS = [
   CIPHER_COLUMN,
   { key: "m", label: "М" },
   { key: "f", label: "Ж" },
-  { key: "year", label: "Год" },
-  { key: "month", label: "Месяц" },
-  { key: "born", label: "Рождение" },
-  { key: "baptism", label: "Крещение" },
+  archiveDateColumn<BirthRecord>({
+    key: "born",
+    label: "Рождение",
+    getDay: (record) => record.born,
+  }),
+  archiveDateColumn<BirthRecord>({
+    key: "baptism",
+    label: "Крещение",
+    getDay: (record) => record.baptism,
+  }),
   { key: "name", label: "Имя" },
   { key: "parents", label: "Родители" },
   { key: "parents_note", label: "Примечание (родители)" },

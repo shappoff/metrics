@@ -1,8 +1,6 @@
 import type { DeathAltRecord } from "./schema";
-import {
-  CIPHER_COLUMN,
-  type VisibleColumn,
-} from "../shared/cipher-column";
+import { CIPHER_COLUMN } from "../shared/cipher-column";
+import type { VisibleColumn } from "../shared/visible-column";
 
 export const DEATH_ALT_VISIBLE_COLUMNS = [
   CIPHER_COLUMN,
