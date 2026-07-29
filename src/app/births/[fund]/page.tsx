@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { LinkList } from "@/components/LinkList";
 import {
-  listCasesForFund,
   listFunds,
+  listInventoriesForFund,
   loadBirthRecords,
 } from "@/data/sources/births";
 
@@ -26,7 +26,7 @@ export default async function FundPage({ params }: Props) {
     notFound();
   }
 
-  const cases = listCasesForFund(records, fund);
+  const inventories = listInventoriesForFund(records, fund);
 
   return (
     <main>
@@ -37,13 +37,13 @@ export default async function FundPage({ params }: Props) {
         ]}
       />
       <h1>Фонд {fund}</h1>
-      <h2>Дела</h2>
+      <h2>Описи</h2>
       <LinkList
-        items={cases.map((item) => ({
-          href: `/births/${encodeURIComponent(fund)}/${encodeURIComponent(item.caseKey)}/`,
-          label: item.caseLabel,
+        items={inventories.map((inventory) => ({
+          href: `/births/${encodeURIComponent(fund)}/${encodeURIComponent(inventory)}/`,
+          label: `Опись ${inventory}`,
         }))}
-        emptyText="В этом фонде нет дел"
+        emptyText="В этом фонде нет описей"
       />
     </main>
   );

@@ -29,7 +29,8 @@ export { birthsConfig } from "./config";
 export { BIRTH_VISIBLE_COLUMNS } from "./columns";
 export {
   listFunds,
-  listCasesForFund,
+  listInventoriesForFund,
+  listCasesForInventory,
   listPagesForCase,
   getRecordsForPage,
   getAdjacentPages,

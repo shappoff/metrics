@@ -1,10 +1,5 @@
 import type { BirthRecord } from "./schema";
 
-export type BirthCase = {
-  caseKey: string;
-  caseLabel: string;
-};
-
 export type BirthPageGroup = {
   page: string;
   records: BirthRecord[];
@@ -19,36 +14,51 @@ export function listFunds(records: BirthRecord[]): string[] {
   return [...funds].sort(compareNatural);
 }
 
-export function listCasesForFund(
+export function listInventoriesForFund(
   records: BirthRecord[],
   fund: string,
-): BirthCase[] {
-  const map = new Map<string, BirthCase>();
+): string[] {
+  const inventories = new Set<string>();
 
   for (const record of records) {
     if (record.fund !== fund) continue;
-    if (!map.has(record.caseKey)) {
-      map.set(record.caseKey, {
-        caseKey: record.caseKey,
-        caseLabel: record.caseLabel,
-      });
-    }
+    inventories.add(record.inventory);
   }
 
-  return [...map.values()].sort((a, b) =>
-    compareNatural(a.caseLabel, b.caseLabel),
-  );
+  return [...inventories].sort(compareNatural);
+}
+
+export function listCasesForInventory(
+  records: BirthRecord[],
+  fund: string,
+  inventory: string,
+): string[] {
+  const cases = new Set<string>();
+
+  for (const record of records) {
+    if (record.fund !== fund || record.inventory !== inventory) continue;
+    cases.add(record.caseNumber);
+  }
+
+  return [...cases].sort(compareNatural);
 }
 
 export function listPagesForCase(
   records: BirthRecord[],
   fund: string,
-  caseKey: string,
+  inventory: string,
+  caseNumber: string,
 ): string[] {
   const pages = new Set<string>();
 
   for (const record of records) {
-    if (record.fund !== fund || record.caseKey !== caseKey) continue;
+    if (
+      record.fund !== fund ||
+      record.inventory !== inventory ||
+      record.caseNumber !== caseNumber
+    ) {
+      continue;
+    }
     if (record.page) pages.add(record.page);
   }
 
@@ -58,23 +68,29 @@ export function listPagesForCase(
 export function getRecordsForPage(
   records: BirthRecord[],
   fund: string,
-  caseKey: string,
+  inventory: string,
+  caseNumber: string,
   page: string,
 ): BirthRecord[] {
   return records.filter(
-    (r) => r.fund === fund && r.caseKey === caseKey && r.page === page,
+    (r) =>
+      r.fund === fund &&
+      r.inventory === inventory &&
+      r.caseNumber === caseNumber &&
+      r.page === page,
   );
 }
 
 export function groupPagesForCase(
   records: BirthRecord[],
   fund: string,
-  caseKey: string,
+  inventory: string,
+  caseNumber: string,
 ): BirthPageGroup[] {
-  const pages = listPagesForCase(records, fund, caseKey);
+  const pages = listPagesForCase(records, fund, inventory, caseNumber);
   return pages.map((page) => ({
     page,
-    records: getRecordsForPage(records, fund, caseKey, page),
+    records: getRecordsForPage(records, fund, inventory, caseNumber, page),
   }));
 }
 

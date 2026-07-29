@@ -22,8 +22,9 @@ export const birthRecordSchema = z.object({
   place4: z.string().optional().default(""),
   church: z.string().optional().default(""),
   fund: z.string(),
+  inventory: z.string(),
+  caseNumber: z.string(),
   caseKey: z.string(),
-  caseLabel: z.string(),
 });
 
 export type BirthRecord = z.infer<typeof birthRecordSchema>;
@@ -33,5 +34,4 @@ export type ParsedFod = {
   inventory: string;
   caseNumber: string;
   caseKey: string;
-  caseLabel: string;
 };

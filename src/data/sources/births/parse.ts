@@ -16,9 +16,8 @@ export function parseFod(fod: string): ParsedFod | null {
   const inventory = parts[1];
   const caseNumber = parts.slice(2).join("-");
   const caseKey = `${inventory}-${caseNumber}`;
-  const caseLabel = `${inventory}-${caseNumber}`;
 
-  return { fund, inventory, caseNumber, caseKey, caseLabel };
+  return { fund, inventory, caseNumber, caseKey };
 }
 
 function pick(row: SheetRow, key: string): string {
@@ -57,8 +56,9 @@ export function parseBirthRows(rows: SheetRow[]): BirthRecord[] {
       place4: pick(row, "place4"),
       church: pick(row, "church"),
       fund: parsed.fund,
+      inventory: parsed.inventory,
+      caseNumber: parsed.caseNumber,
       caseKey: parsed.caseKey,
-      caseLabel: parsed.caseLabel,
     };
 
     const result = birthRecordSchema.safeParse(candidate);
