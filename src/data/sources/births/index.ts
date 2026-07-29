@@ -4,17 +4,25 @@ import { parseBirthRows } from "./parse";
 import type { BirthRecord } from "./schema";
 
 let cachedRecords: BirthRecord[] | null = null;
+let loadPromise: Promise<BirthRecord[]> | null = null;
 
 export async function loadBirthRecords(): Promise<BirthRecord[]> {
   if (cachedRecords) return cachedRecords;
+  if (loadPromise) return loadPromise;
 
-  const rows = await fetchSheetRows({
-    spreadsheetId: birthsConfig.spreadsheetId,
-    sheetName: birthsConfig.sheetName,
+  loadPromise = (async () => {
+    const rows = await fetchSheetRows({
+      spreadsheetId: birthsConfig.spreadsheetId,
+      sheetName: birthsConfig.sheetName,
+    });
+    cachedRecords = parseBirthRows(rows);
+    return cachedRecords;
+  })().catch((error) => {
+    loadPromise = null;
+    throw error;
   });
 
-  cachedRecords = parseBirthRows(rows);
-  return cachedRecords;
+  return loadPromise;
 }
 
 export { birthsConfig } from "./config";

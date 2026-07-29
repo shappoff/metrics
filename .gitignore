@@ -13,6 +13,9 @@
 /.next/
 /out/
 
+# build-time Google Sheets cache (shared across Next workers)
+/.cache/
+
 # production
 /build
 
