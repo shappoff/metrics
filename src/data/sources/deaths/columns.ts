@@ -1,8 +1,11 @@
 import type { DeathRecord } from "./schema";
+import {
+  CIPHER_COLUMN,
+  type VisibleColumn,
+} from "../shared/cipher-column";
 
 export const DEATH_VISIBLE_COLUMNS = [
-  { key: "fod", label: "Фонд-Опись-Дело" },
-  { key: "page", label: "лл." },
+  CIPHER_COLUMN,
   { key: "year", label: "Год" },
   { key: "month", label: "Месяц" },
   { key: "m", label: "М" },
@@ -17,7 +20,4 @@ export const DEATH_VISIBLE_COLUMNS = [
   { key: "notes", label: "Примечания" },
   { key: "priest", label: "Священник" },
   { key: "church", label: "Церковь" },
-] as const satisfies ReadonlyArray<{
-  key: keyof DeathRecord;
-  label: string;
-}>;
+] as const satisfies ReadonlyArray<VisibleColumn<DeathRecord>>;

@@ -1,8 +1,11 @@
 import type { BirthExtraRecord } from "./schema";
+import {
+  CIPHER_COLUMN,
+  type VisibleColumn,
+} from "../shared/cipher-column";
 
 export const BIRTH_EXTRA_VISIBLE_COLUMNS = [
-  { key: "fod", label: "Фонд-Опись-Дело" },
-  { key: "page", label: "лл." },
+  CIPHER_COLUMN,
   { key: "m", label: "М" },
   { key: "f", label: "Ж" },
   { key: "born", label: "Рождение" },
@@ -15,8 +18,4 @@ export const BIRTH_EXTRA_VISIBLE_COLUMNS = [
   { key: "godparents_note", label: "Примечание (крёстные)" },
   { key: "notes", label: "Примечания" },
   { key: "church", label: "Церковь" },
-] as const satisfies ReadonlyArray<{
-  key: keyof BirthExtraRecord;
-  label: string;
-}>;
-
+] as const satisfies ReadonlyArray<VisibleColumn<BirthExtraRecord>>;

@@ -1,6 +1,7 @@
 type Column<TRecord extends Record<string, string>> = {
-  key: keyof TRecord;
+  key: string;
   label: string;
+  getValue?: (record: TRecord) => string;
 };
 
 type Props<TRecord extends Record<string, string>> = {
@@ -9,6 +10,17 @@ type Props<TRecord extends Record<string, string>> = {
   emptyText: string;
   getItemKey: (record: TRecord, index: number) => string;
 };
+
+function readColumnValue<TRecord extends Record<string, string>>(
+  record: TRecord,
+  column: Column<TRecord>
+): string {
+  if (column.getValue) {
+    return column.getValue(record);
+  }
+
+  return record[column.key] ?? "";
+}
 
 export function RecordDetailsList<TRecord extends Record<string, string>>({
   records,
@@ -26,11 +38,11 @@ export function RecordDetailsList<TRecord extends Record<string, string>>({
         <article className="record" key={getItemKey(record, index)}>
           <dl>
             {columns.map((column) => {
-              const value = record[column.key];
+              const value = readColumnValue(record, column);
               if (!value) return null;
 
               return (
-                <div key={String(column.key)} style={{ display: "contents" }}>
+                <div key={column.key} style={{ display: "contents" }}>
                   <dt>{column.label}</dt>
                   <dd>{value}</dd>
                 </div>

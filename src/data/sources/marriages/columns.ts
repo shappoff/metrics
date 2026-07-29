@@ -1,8 +1,11 @@
 import type { MarriageRecord } from "./schema";
+import {
+  CIPHER_COLUMN,
+  type VisibleColumn,
+} from "../shared/cipher-column";
 
 export const MARRIAGE_VISIBLE_COLUMNS = [
-  { key: "fod", label: "Фонд-Опись-Дело" },
-  { key: "page", label: "лл." },
+  CIPHER_COLUMN,
   { key: "year", label: "Год" },
   { key: "month", label: "Месяц" },
   { key: "№", label: "№" },
@@ -18,7 +21,4 @@ export const MARRIAGE_VISIBLE_COLUMNS = [
   { key: "notes", label: "Примечания" },
   { key: "priest", label: "Священник" },
   { key: "church", label: "Церковь" },
-] as const satisfies ReadonlyArray<{
-  key: keyof MarriageRecord;
-  label: string;
-}>;
+] as const satisfies ReadonlyArray<VisibleColumn<MarriageRecord>>;
