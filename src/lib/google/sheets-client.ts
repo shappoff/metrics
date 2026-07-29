@@ -1,31 +1,38 @@
 import { google } from "googleapis";
 import type { FetchSheetOptions, SheetRow } from "./types";
 
-function getCredentials() {
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+function getOAuthCredentials() {
+  const clientId = process.env.GAPI_CREDENTIALS_CLIENT_ID;
+  const clientSecret = process.env.GAPI_CREDENTIALS_CLIENT_SECRET;
+  const refreshToken = process.env.GAPI_CREDENTIALS_REFRESH_TOKEN;
 
-  if (!email || !privateKey) {
+  if (!clientId || !clientSecret || !refreshToken) {
     throw new Error(
-      "Missing GOOGLE_SERVICE_ACCOUNT_EMAIL or GOOGLE_PRIVATE_KEY. " +
+      "Missing GAPI_CREDENTIALS_CLIENT_ID, GAPI_CREDENTIALS_CLIENT_SECRET, or GAPI_CREDENTIALS_REFRESH_TOKEN. " +
         "Set them in .env.local (local) or GitHub Secrets (CI).",
     );
   }
 
-  return { email, privateKey };
+  return {
+    type: "authorized_user" as const,
+    client_id: clientId,
+    client_secret: clientSecret,
+    refresh_token: refreshToken,
+    ...(process.env.GAPI_CREDENTIALS_CLIENT_EMAIL
+      ? { client_email: process.env.GAPI_CREDENTIALS_CLIENT_EMAIL }
+      : {}),
+    token_url: "https://oauth2.googleapis.com/token",
+    universe_domain: "googleapis.com",
+  };
 }
 
 export async function fetchSheetRows({
   spreadsheetId,
   sheetName,
 }: FetchSheetOptions): Promise<SheetRow[]> {
-  const { email, privateKey } = getCredentials();
-
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: email,
-      private_key: privateKey,
-    },
+  const auth = await google.auth.getClient({
+    projectId: process.env.GAPI_PROJECT_ID,
+    credentials: getOAuthCredentials(),
     scopes: ["https://www.googleapis.com/auth/spreadsheets.readonly"],
   });
 

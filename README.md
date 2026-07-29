@@ -10,16 +10,22 @@
 
 ## Локальный запуск
 
-1. Создайте Service Account в Google Cloud и скачайте JSON-ключ.
-2. Откройте доступ к таблице на email сервис-аккаунта (роль Reader).
-3. Скопируйте `.env.example` → `.env.local` и заполните:
+Авторизация — OAuth2 пользователя (`authorized_user`), как в `metrics-indexation`. PEM / Service Account не нужны.
+
+1. Скопируйте `.env.example` → `.env.local` и заполните:
 
 ```env
-GOOGLE_SERVICE_ACCOUNT_EMAIL=your-sa@project.iam.gserviceaccount.com
-GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+GAPI_PROJECT_ID=your-gcp-project-id
+GAPI_CREDENTIALS_CLIENT_ID=....apps.googleusercontent.com
+GAPI_CREDENTIALS_CLIENT_SECRET=GOCSPX-...
+GAPI_CREDENTIALS_REFRESH_TOKEN=1//...
+GAPI_CREDENTIALS_CLIENT_EMAIL=you@gmail.com
 ```
 
-4. Установите зависимости и соберите:
+Обязательны: `CLIENT_ID`, `CLIENT_SECRET`, `REFRESH_TOKEN`.  
+`GAPI_PROJECT_ID` и `CLIENT_EMAIL` — опционально.
+
+2. Установите зависимости и соберите:
 
 ```bash
 npm install
@@ -27,14 +33,16 @@ npm run build
 npx serve out
 ```
 
-Для разработки: `npm run dev` (данные тоже читаются при запросе страниц на этапе рендера).
+Для разработки: `npm run dev` (данные читаются при рендере страниц на этапе сборки/запроса).
 
 ## GitHub Pages
 
 1. В репозитории: **Settings → Pages → Source → GitHub Actions**.
 2. Добавьте secrets (**Settings → Secrets and variables → Actions**):
-   - `GOOGLE_SERVICE_ACCOUNT_EMAIL`
-   - `GOOGLE_PRIVATE_KEY` (ключ целиком; переносы строк можно оставить как `\n`)
+   - `GAPI_CREDENTIALS_CLIENT_ID`
+   - `GAPI_CREDENTIALS_CLIENT_SECRET`
+   - `GAPI_CREDENTIALS_REFRESH_TOKEN`
+   - (опционально) `GAPI_PROJECT_ID`, `GAPI_CREDENTIALS_CLIENT_EMAIL`
 3. Запушьте в `main`/`master` или запустите workflow **Deploy to GitHub Pages** вручную.
 
 `NEXT_PUBLIC_BASE_PATH` в CI выставляется как `/<имя-репозитория>` (для project pages).
