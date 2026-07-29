@@ -1,4 +1,5 @@
 import { type BirthRecord, loadBirthRecords } from "@/data/sources/births";
+import { type DeathRecord, loadDeathRecords } from "@/data/sources/deaths";
 import { type MarriageRecord, loadMarriageRecords } from "@/data/sources/marriages";
 import {
   getAdjacentPages,
@@ -19,11 +20,17 @@ type ScopedMarriageRecord = RouteRecord & {
   record: MarriageRecord;
 };
 
-type ScopedRecord = ScopedBirthRecord | ScopedMarriageRecord;
+type ScopedDeathRecord = RouteRecord & {
+  source: "deaths";
+  record: DeathRecord;
+};
+
+type ScopedRecord = ScopedBirthRecord | ScopedMarriageRecord | ScopedDeathRecord;
 
 type CombinedRecords = {
   births: BirthRecord[];
   marriages: MarriageRecord[];
+  deaths: DeathRecord[];
   scoped: ScopedRecord[];
 };
 
@@ -52,16 +59,36 @@ function withMarriageScope(records: MarriageRecord[]): ScopedMarriageRecord[] {
   }));
 }
 
+function withDeathScope(records: DeathRecord[]): ScopedDeathRecord[] {
+  return records.map((record) => ({
+    source: "deaths",
+    record,
+    fund: record.fund,
+    inventory: record.inventory,
+    caseNumber: record.caseNumber,
+    page: record.page,
+  }));
+}
+
 export async function loadCombinedRecords(): Promise<CombinedRecords> {
   if (cachedCombined) return cachedCombined;
   if (loadPromise) return loadPromise;
 
-  loadPromise = Promise.all([loadBirthRecords(), loadMarriageRecords()])
-    .then(([births, marriages]) => {
+  loadPromise = Promise.all([
+    loadBirthRecords(),
+    loadMarriageRecords(),
+    loadDeathRecords(),
+  ])
+    .then(([births, marriages, deaths]) => {
       cachedCombined = {
         births,
         marriages,
-        scoped: [...withBirthScope(births), ...withMarriageScope(marriages)],
+        deaths,
+        scoped: [
+          ...withBirthScope(births),
+          ...withMarriageScope(marriages),
+          ...withDeathScope(deaths),
+        ],
       };
       return cachedCombined;
     })
@@ -105,10 +132,15 @@ export async function getCombinedPageRecords(
   inventory: string,
   caseNumber: string,
   page: string,
-): Promise<{ births: BirthRecord[]; marriages: MarriageRecord[] }> {
+): Promise<{
+  births: BirthRecord[];
+  marriages: MarriageRecord[];
+  deaths: DeathRecord[];
+}> {
   const { scoped } = await loadCombinedRecords();
   const births: BirthRecord[] = [];
   const marriages: MarriageRecord[] = [];
+  const deaths: DeathRecord[] = [];
 
   for (const entry of scoped) {
     if (
@@ -122,9 +154,10 @@ export async function getCombinedPageRecords(
 
     if (entry.source === "births") births.push(entry.record);
     if (entry.source === "marriages") marriages.push(entry.record);
+    if (entry.source === "deaths") deaths.push(entry.record);
   }
 
-  return { births, marriages };
+  return { births, marriages, deaths };
 }
 
 export async function getCombinedAdjacentPages(

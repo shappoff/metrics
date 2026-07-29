@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { BirthRecords } from "@/components/BirthRecords";
+import { DeathRecords } from "@/components/DeathRecords";
 import { MarriageRecords } from "@/components/MarriageRecords";
 import { PagePager } from "@/components/PagePager";
 import {
@@ -151,7 +152,15 @@ export default async function PageView({ params }: Props) {
           <MarriageRecords records={pageRecords.marriages} />
         </>
       ) : null}
-      {pageRecords.births.length === 0 && pageRecords.marriages.length === 0 ? (
+      {pageRecords.deaths.length > 0 ? (
+        <>
+          <h2>Умершие</h2>
+          <DeathRecords records={pageRecords.deaths} />
+        </>
+      ) : null}
+      {pageRecords.births.length === 0 &&
+      pageRecords.marriages.length === 0 &&
+      pageRecords.deaths.length === 0 ? (
         <p className="empty">На этой странице нет записей</p>
       ) : null}
     </main>
