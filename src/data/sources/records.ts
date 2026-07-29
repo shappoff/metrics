@@ -1,5 +1,9 @@
 import { type BirthRecord, loadBirthRecords } from "@/data/sources/births";
 import { type DeathRecord, loadDeathRecords } from "@/data/sources/deaths";
+import {
+  type DeathAltRecord,
+  loadDeathAltRecords,
+} from "@/data/sources/deaths_alt";
 import { type MarriageRecord, loadMarriageRecords } from "@/data/sources/marriages";
 import {
   type MarriageAltRecord,
@@ -38,6 +42,11 @@ type ScopedDeathRecord = RouteRecord & {
   record: DeathRecord;
 };
 
+type ScopedDeathAltRecord = RouteRecord & {
+  source: "deaths_alt";
+  record: DeathAltRecord;
+};
+
 type ScopedBirthExtraRecord = RouteRecord & {
   source: "births_extra";
   record: BirthExtraRecord;
@@ -48,6 +57,7 @@ type ScopedRecord =
   | ScopedMarriageRecord
   | ScopedMarriageAltRecord
   | ScopedDeathRecord
+  | ScopedDeathAltRecord
   | ScopedBirthExtraRecord;
 
 type CombinedRecords = {
@@ -56,6 +66,7 @@ type CombinedRecords = {
   marriages: MarriageRecord[];
   marriagesAlt: MarriageAltRecord[];
   deaths: DeathRecord[];
+  deathsAlt: DeathAltRecord[];
   scoped: ScopedRecord[];
 };
 
@@ -108,6 +119,17 @@ function withDeathScope(records: DeathRecord[]): ScopedDeathRecord[] {
   }));
 }
 
+function withDeathAltScope(records: DeathAltRecord[]): ScopedDeathAltRecord[] {
+  return records.map((record) => ({
+    source: "deaths_alt",
+    record,
+    fund: record.fund,
+    inventory: record.inventory,
+    caseNumber: record.caseNumber,
+    page: record.page,
+  }));
+}
+
 function withBirthExtraScope(
   records: BirthExtraRecord[],
 ): ScopedBirthExtraRecord[] {
@@ -135,19 +157,22 @@ export async function loadCombinedRecords(): Promise<CombinedRecords> {
     loadMarriageRecords(),
     loadMarriageAltRecords(),
     loadDeathRecords(),
-  ]).then(([births, birthsExtra, marriages, marriagesAlt, deaths]) => {
+    loadDeathAltRecords(),
+  ]).then(([births, birthsExtra, marriages, marriagesAlt, deaths, deathsAlt]) => {
       cachedCombined = {
         births,
         birthsExtra,
         marriages,
         marriagesAlt,
         deaths,
+        deathsAlt,
         scoped: [
           ...withBirthScope(births),
           ...withBirthExtraScope(birthsExtra),
           ...withMarriageScope(marriages),
           ...withMarriageAltScope(marriagesAlt),
           ...withDeathScope(deaths),
+          ...withDeathAltScope(deathsAlt),
         ],
       };
       return cachedCombined;
@@ -198,6 +223,7 @@ export async function getCombinedPageRecords(
   marriages: MarriageRecord[];
   marriagesAlt: MarriageAltRecord[];
   deaths: DeathRecord[];
+  deathsAlt: DeathAltRecord[];
 }> {
   const { scoped } = await loadCombinedRecords();
   const births: BirthRecord[] = [];
@@ -205,6 +231,7 @@ export async function getCombinedPageRecords(
   const marriages: MarriageRecord[] = [];
   const marriagesAlt: MarriageAltRecord[] = [];
   const deaths: DeathRecord[] = [];
+  const deathsAlt: DeathAltRecord[] = [];
 
   for (const entry of scoped) {
     if (
@@ -221,6 +248,7 @@ export async function getCombinedPageRecords(
     if (entry.source === "marriages") marriages.push(entry.record);
     if (entry.source === "marriages_alt") marriagesAlt.push(entry.record);
     if (entry.source === "deaths") deaths.push(entry.record);
+    if (entry.source === "deaths_alt") deathsAlt.push(entry.record);
   }
 
   // Ensure deterministic ordering before rendering.
@@ -229,8 +257,9 @@ export async function getCombinedPageRecords(
   marriages.sort((a, b) => compareNatural(a.fod, b.fod));
   marriagesAlt.sort((a, b) => compareNatural(a.fod, b.fod));
   deaths.sort((a, b) => compareNatural(a.fod, b.fod));
+  deathsAlt.sort((a, b) => compareNatural(a.fod, b.fod));
 
-  return { births, birthsExtra, marriages, marriagesAlt, deaths };
+  return { births, birthsExtra, marriages, marriagesAlt, deaths, deathsAlt };
 }
 
 export async function getCombinedAdjacentPages(

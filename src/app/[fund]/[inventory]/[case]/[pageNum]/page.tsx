@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { BirthRecords } from "@/components/BirthRecords";
 import { BirthExtraRecords } from "@/components/BirthExtraRecords";
+import { DeathAltRecords } from "@/components/DeathAltRecords";
 import { DeathRecords } from "@/components/DeathRecords";
 import { MarriageRecords } from "@/components/MarriageRecords";
 import { MarriageAltRecords } from "@/components/MarriageAltRecords";
@@ -171,17 +172,23 @@ export default async function PageView({ params }: Props) {
           <MarriageAltRecords records={pageRecords.marriagesAlt} />
         </>
       ) : null}
-      {pageRecords.deaths.length > 0 ? (
+      {pageRecords.deaths.length > 0 || pageRecords.deathsAlt.length > 0 ? (
         <>
           <h2>Умершие</h2>
-          <DeathRecords records={pageRecords.deaths} />
+          {pageRecords.deaths.length > 0 ? (
+            <DeathRecords records={pageRecords.deaths} />
+          ) : null}
+          {pageRecords.deathsAlt.length > 0 ? (
+            <DeathAltRecords records={pageRecords.deathsAlt} />
+          ) : null}
         </>
       ) : null}
       {pageRecords.births.length === 0 &&
       pageRecords.birthsExtra.length === 0 &&
       pageRecords.marriages.length === 0 &&
       pageRecords.marriagesAlt.length === 0 &&
-      pageRecords.deaths.length === 0 ? (
+      pageRecords.deaths.length === 0 &&
+      pageRecords.deathsAlt.length === 0 ? (
         <p className="empty">На этой странице нет записей</p>
       ) : null}
     </main>
