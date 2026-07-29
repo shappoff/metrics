@@ -2,24 +2,23 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { LinkList } from "@/components/LinkList";
 import {
-  casePath,
-  fundPath,
-  listCasesForInventory,
-  listFunds,
-  listInventoriesForFund,
-  loadBirthRecords,
-} from "@/data/sources/births";
+  listCombinedCasesForInventory,
+  listCombinedFunds,
+  listCombinedInventoriesForFund,
+} from "@/data/sources/records";
+import { casePath, fundPath } from "@/data/sources/shared/paths";
 
 type Props = {
   params: Promise<{ fund: string; inventory: string }>;
 };
 
 export async function generateStaticParams() {
-  const records = await loadBirthRecords();
   const params: Array<{ fund: string; inventory: string }> = [];
+  const funds = await listCombinedFunds();
 
-  for (const fund of listFunds(records)) {
-    for (const inventory of listInventoriesForFund(records, fund)) {
+  for (const fund of funds) {
+    const inventories = await listCombinedInventoriesForFund(fund);
+    for (const inventory of inventories) {
       params.push({ fund, inventory });
     }
   }
@@ -31,17 +30,18 @@ export default async function InventoryPage({ params }: Props) {
   const { fund: fundParam, inventory: inventoryParam } = await params;
   const fund = decodeURIComponent(fundParam);
   const inventory = decodeURIComponent(inventoryParam);
-  const records = await loadBirthRecords();
+  const funds = await listCombinedFunds();
 
-  if (!listFunds(records).includes(fund)) {
+  if (!funds.includes(fund)) {
     notFound();
   }
 
-  if (!listInventoriesForFund(records, fund).includes(inventory)) {
+  const inventories = await listCombinedInventoriesForFund(fund);
+  if (!inventories.includes(inventory)) {
     notFound();
   }
 
-  const cases = listCasesForInventory(records, fund, inventory);
+  const cases = await listCombinedCasesForInventory(fund, inventory);
 
   return (
     <main>

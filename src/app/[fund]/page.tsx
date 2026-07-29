@@ -2,32 +2,30 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { LinkList } from "@/components/LinkList";
 import {
-  inventoryPath,
-  listFunds,
-  listInventoriesForFund,
-  loadBirthRecords,
-} from "@/data/sources/births";
+  listCombinedFunds,
+  listCombinedInventoriesForFund,
+} from "@/data/sources/records";
+import { inventoryPath } from "@/data/sources/shared/paths";
 
 type Props = {
   params: Promise<{ fund: string }>;
 };
 
 export async function generateStaticParams() {
-  const records = await loadBirthRecords();
-  return listFunds(records).map((fund) => ({ fund }));
+  const funds = await listCombinedFunds();
+  return funds.map((fund) => ({ fund }));
 }
 
 export default async function FundPage({ params }: Props) {
   const { fund: fundParam } = await params;
   const fund = decodeURIComponent(fundParam);
-  const records = await loadBirthRecords();
-  const funds = listFunds(records);
+  const funds = await listCombinedFunds();
 
   if (!funds.includes(fund)) {
     notFound();
   }
 
-  const inventories = listInventoriesForFund(records, fund);
+  const inventories = await listCombinedInventoriesForFund(fund);
 
   return (
     <main>

@@ -1,24 +1,6 @@
 import type { SheetRow } from "@/lib/google/types";
-import {
-  birthRecordSchema,
-  type BirthRecord,
-  type ParsedFod,
-} from "./schema";
-
-export function parseFod(fod: string): ParsedFod | null {
-  const trimmed = fod.trim();
-  if (!trimmed) return null;
-
-  const parts = trimmed.split("-").map((p) => p.trim()).filter(Boolean);
-  if (parts.length < 3) return null;
-
-  const fund = parts[0];
-  const inventory = parts[1];
-  const caseNumber = parts.slice(2).join("-");
-  const caseKey = `${inventory}-${caseNumber}`;
-
-  return { fund, inventory, caseNumber, caseKey };
-}
+import { parseFod } from "../shared/parse-fod";
+import { birthRecordSchema, type BirthRecord } from "./schema";
 
 function pick(row: SheetRow, key: string): string {
   return (row[key] ?? "").trim();

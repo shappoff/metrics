@@ -2,31 +2,26 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { LinkList } from "@/components/LinkList";
 import {
-  fundPath,
-  inventoryPath,
-  listCasesForInventory,
-  listFunds,
-  listInventoriesForFund,
-  listPagesForCase,
-  loadBirthRecords,
-  pagePath,
-} from "@/data/sources/births";
+  listCombinedCasesForInventory,
+  listCombinedFunds,
+  listCombinedInventoriesForFund,
+  listCombinedPagesForCase,
+} from "@/data/sources/records";
+import { fundPath, inventoryPath, pagePath } from "@/data/sources/shared/paths";
 
 type Props = {
   params: Promise<{ fund: string; inventory: string; case: string }>;
 };
 
 export async function generateStaticParams() {
-  const records = await loadBirthRecords();
   const params: Array<{ fund: string; inventory: string; case: string }> = [];
+  const funds = await listCombinedFunds();
 
-  for (const fund of listFunds(records)) {
-    for (const inventory of listInventoriesForFund(records, fund)) {
-      for (const caseNumber of listCasesForInventory(
-        records,
-        fund,
-        inventory,
-      )) {
+  for (const fund of funds) {
+    const inventories = await listCombinedInventoriesForFund(fund);
+    for (const inventory of inventories) {
+      const cases = await listCombinedCasesForInventory(fund, inventory);
+      for (const caseNumber of cases) {
         params.push({ fund, inventory, case: caseNumber });
       }
     }
@@ -44,21 +39,23 @@ export default async function CasePage({ params }: Props) {
   const fund = decodeURIComponent(fundParam);
   const inventory = decodeURIComponent(inventoryParam);
   const caseNumber = decodeURIComponent(caseParam);
-  const records = await loadBirthRecords();
+  const funds = await listCombinedFunds();
 
-  if (!listFunds(records).includes(fund)) {
+  if (!funds.includes(fund)) {
     notFound();
   }
 
-  if (!listInventoriesForFund(records, fund).includes(inventory)) {
+  const inventories = await listCombinedInventoriesForFund(fund);
+  if (!inventories.includes(inventory)) {
     notFound();
   }
 
-  if (!listCasesForInventory(records, fund, inventory).includes(caseNumber)) {
+  const cases = await listCombinedCasesForInventory(fund, inventory);
+  if (!cases.includes(caseNumber)) {
     notFound();
   }
 
-  const pages = listPagesForCase(records, fund, inventory, caseNumber);
+  const pages = await listCombinedPagesForCase(fund, inventory, caseNumber);
 
   return (
     <main>

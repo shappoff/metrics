@@ -1,21 +1,23 @@
 import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { BirthRecords } from "@/components/BirthRecords";
+import { MarriageRecords } from "@/components/MarriageRecords";
 import { PagePager } from "@/components/PagePager";
+import {
+  getCombinedAdjacentPages,
+  getCombinedPageRecords,
+  listCombinedCasesForInventory,
+  listCombinedFunds,
+  listCombinedInventoriesForFund,
+  listCombinedPagesForCase,
+} from "@/data/sources/records";
 import {
   casePath,
   fundPath,
-  getAdjacentPages,
-  getRecordsForPage,
   inventoryPath,
-  listCasesForInventory,
-  listFunds,
-  listInventoriesForFund,
-  listPagesForCase,
-  loadBirthRecords,
   normalizePageRouteSegment,
   pagePath,
-} from "@/data/sources/births";
+} from "@/data/sources/shared/paths";
 
 type Props = {
   params: Promise<{
@@ -27,27 +29,21 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  const records = await loadBirthRecords();
   const params: Array<{
     fund: string;
     inventory: string;
     case: string;
     pageNum: string;
   }> = [];
+  const funds = await listCombinedFunds();
 
-  for (const fund of listFunds(records)) {
-    for (const inventory of listInventoriesForFund(records, fund)) {
-      for (const caseNumber of listCasesForInventory(
-        records,
-        fund,
-        inventory,
-      )) {
-        for (const page of listPagesForCase(
-          records,
-          fund,
-          inventory,
-          caseNumber,
-        )) {
+  for (const fund of funds) {
+    const inventories = await listCombinedInventoriesForFund(fund);
+    for (const inventory of inventories) {
+      const cases = await listCombinedCasesForInventory(fund, inventory);
+      for (const caseNumber of cases) {
+        const pages = await listCombinedPagesForCase(fund, inventory, caseNumber);
+        for (const page of pages) {
           params.push({
             fund,
             inventory,
@@ -74,21 +70,23 @@ export default async function PageView({ params }: Props) {
   const caseNumber = decodeURIComponent(caseParam);
   const rawPageNum = decodeURIComponent(pageParam);
   const normalizedPageNum = normalizePageRouteSegment(rawPageNum);
-  const records = await loadBirthRecords();
+  const funds = await listCombinedFunds();
 
-  if (!listFunds(records).includes(fund)) {
+  if (!funds.includes(fund)) {
     notFound();
   }
 
-  if (!listInventoriesForFund(records, fund).includes(inventory)) {
+  const inventories = await listCombinedInventoriesForFund(fund);
+  if (!inventories.includes(inventory)) {
     notFound();
   }
 
-  if (!listCasesForInventory(records, fund, inventory).includes(caseNumber)) {
+  const cases = await listCombinedCasesForInventory(fund, inventory);
+  if (!cases.includes(caseNumber)) {
     notFound();
   }
 
-  const pages = listPagesForCase(records, fund, inventory, caseNumber);
+  const pages = await listCombinedPagesForCase(fund, inventory, caseNumber);
   const pageNum = pages.find(
     (page) => normalizePageRouteSegment(page) === normalizedPageNum,
   );
@@ -102,14 +100,18 @@ export default async function PageView({ params }: Props) {
     redirect(canonicalPath);
   }
 
-  const pageRecords = getRecordsForPage(
-    records,
+  const pageRecords = await getCombinedPageRecords(
     fund,
     inventory,
     caseNumber,
     pageNum,
   );
-  const { prev, next } = getAdjacentPages(pages, pageNum);
+  const { prev, next, total } = await getCombinedAdjacentPages(
+    fund,
+    inventory,
+    caseNumber,
+    pageNum,
+  );
 
   return (
     <main>
@@ -135,9 +137,23 @@ export default async function PageView({ params }: Props) {
         nextHref={
           next ? pagePath(fund, inventory, caseNumber, next) : null
         }
-        currentLabel={`лл. ${pageNum} из ${pages.length}`}
+        currentLabel={`лл. ${pageNum} из ${total}`}
       />
-      <BirthRecords records={pageRecords} />
+      {pageRecords.births.length > 0 ? (
+        <>
+          <h2>Рождения</h2>
+          <BirthRecords records={pageRecords.births} />
+        </>
+      ) : null}
+      {pageRecords.marriages.length > 0 ? (
+        <>
+          <h2>Бракосочетания</h2>
+          <MarriageRecords records={pageRecords.marriages} />
+        </>
+      ) : null}
+      {pageRecords.births.length === 0 && pageRecords.marriages.length === 0 ? (
+        <p className="empty">На этой странице нет записей</p>
+      ) : null}
     </main>
   );
 }

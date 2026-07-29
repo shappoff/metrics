@@ -28,10 +28,3 @@ export const birthRecordSchema = z.object({
 });
 
 export type BirthRecord = z.infer<typeof birthRecordSchema>;
-
-export type ParsedFod = {
-  fund: string;
-  inventory: string;
-  caseNumber: string;
-  caseKey: string;
-};
