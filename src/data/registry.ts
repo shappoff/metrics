@@ -8,6 +8,9 @@ import type { DeathRecord } from "@/data/sources/deaths";
 import { marriagesConfig } from "@/data/sources/marriages";
 import { parseMarriageRows } from "./sources/marriages/parse";
 import type { MarriageRecord } from "@/data/sources/marriages";
+import { marriagesAltConfig } from "@/data/sources/marriages_alt";
+import { parseMarriageAltRows } from "./sources/marriages_alt/parse";
+import type { MarriageAltRecord } from "@/data/sources/marriages_alt";
 import { birthsExtraConfig } from "@/data/sources/births_extra";
 import { parseBirthExtraRows } from "./sources/births_extra/parse";
 import type { BirthExtraRecord } from "@/data/sources/births_extra";
@@ -36,6 +39,14 @@ export const marriagesSource: DataSource<MarriageRecord> = {
   parseRows: parseMarriageRows,
 };
 
+export const marriagesAltSource: DataSource<MarriageAltRecord> = {
+  id: marriagesAltConfig.id,
+  title: marriagesAltConfig.title,
+  spreadsheetId: marriagesAltConfig.spreadsheetId,
+  sheetName: marriagesAltConfig.sheetName,
+  parseRows: parseMarriageAltRows,
+};
+
 export const deathsSource: DataSource<DeathRecord> = {
   id: deathsConfig.id,
   title: deathsConfig.title,
@@ -57,6 +68,7 @@ export const dataSources = [
   birthsSource,
   birthsExtraSource,
   marriagesSource,
+  marriagesAltSource,
   deathsSource,
 ] as const;
 

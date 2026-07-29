@@ -4,6 +4,7 @@ import { BirthRecords } from "@/components/BirthRecords";
 import { BirthExtraRecords } from "@/components/BirthExtraRecords";
 import { DeathRecords } from "@/components/DeathRecords";
 import { MarriageRecords } from "@/components/MarriageRecords";
+import { MarriageAltRecords } from "@/components/MarriageAltRecords";
 import { PagePager } from "@/components/PagePager";
 import {
   getCombinedAdjacentPages,
@@ -155,7 +156,19 @@ export default async function PageView({ params }: Props) {
       {pageRecords.marriages.length > 0 ? (
         <>
           <h2>Бракосочетания</h2>
-          <MarriageRecords records={pageRecords.marriages} />
+          {pageRecords.marriages.length > 0 ? (
+            <MarriageRecords records={pageRecords.marriages} />
+          ) : null}
+          {pageRecords.marriagesAlt.length > 0 ? (
+            <MarriageAltRecords records={pageRecords.marriagesAlt} />
+          ) : null}
+        </>
+      ) : null}
+      {pageRecords.marriages.length === 0 &&
+      pageRecords.marriagesAlt.length > 0 ? (
+        <>
+          <h2>Бракосочетания</h2>
+          <MarriageAltRecords records={pageRecords.marriagesAlt} />
         </>
       ) : null}
       {pageRecords.deaths.length > 0 ? (
@@ -167,6 +180,7 @@ export default async function PageView({ params }: Props) {
       {pageRecords.births.length === 0 &&
       pageRecords.birthsExtra.length === 0 &&
       pageRecords.marriages.length === 0 &&
+      pageRecords.marriagesAlt.length === 0 &&
       pageRecords.deaths.length === 0 ? (
         <p className="empty">На этой странице нет записей</p>
       ) : null}
