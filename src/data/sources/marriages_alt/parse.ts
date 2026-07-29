@@ -1,5 +1,6 @@
 import type { SheetRow } from "@/lib/google/types";
 import { parseFod } from "../shared/parse-fod";
+import { shouldSkipRowByChurch } from "../shared/skip-row";
 import {
   marriagesAltRecordSchema,
   type MarriageAltRecord,
@@ -16,6 +17,7 @@ export function parseMarriageAltRows(rows: SheetRow[]): MarriageAltRecord[] {
     const fod = pick(row, "fod");
     const parsed = parseFod(fod);
     if (!parsed) continue;
+    if (shouldSkipRowByChurch(pick(row, "church"))) continue;
 
     const page = pick(row, "page") || "—";
 

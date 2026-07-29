@@ -1,5 +1,6 @@
 import type { SheetRow } from "@/lib/google/types";
 import { parseFod } from "../shared/parse-fod";
+import { shouldSkipRowByChurch } from "../shared/skip-row";
 import { birthExtraRecordSchema, type BirthExtraRecord } from "./schema";
 
 function pick(row: SheetRow, key: string): string {
@@ -13,6 +14,7 @@ export function parseBirthExtraRows(rows: SheetRow[]): BirthExtraRecord[] {
     const fod = pick(row, "fod");
     const parsed = parseFod(fod);
     if (!parsed) continue;
+    if (shouldSkipRowByChurch(pick(row, "church"))) continue;
 
     const page = pick(row, "page") || "—";
 
