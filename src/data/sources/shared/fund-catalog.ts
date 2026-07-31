@@ -28,5 +28,5 @@ export function formatFundCrumb(fund: string): string {
  */
 export function formatFundLabel(fund: string): string {
   const name = getFundName(fund);
-  return name ? `${formatFundRef(fund)} — ${name}` : formatFundRef(fund);
+  return name ? `${formatFundRef(fund)} - ${name}` : formatFundRef(fund);
 }
