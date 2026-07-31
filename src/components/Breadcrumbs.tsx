@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
 
 type Crumb = {
@@ -8,10 +7,9 @@ type Crumb = {
 
 type Props = {
   items: Crumb[];
-  trailing?: ReactNode;
 };
 
-export function Breadcrumbs({ items, trailing }: Props) {
+export function Breadcrumbs({ items }: Props) {
   return (
     <div className="sticky-bar">
       <nav className="breadcrumbs" aria-label="Навигация">
@@ -26,7 +24,6 @@ export function Breadcrumbs({ items, trailing }: Props) {
           </span>
         ))}
       </nav>
-      {trailing}
     </div>
   );
 }

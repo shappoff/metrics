@@ -118,7 +118,7 @@ export default async function PageView({ params }: Props) {
   );
 
   return (
-    <main>
+    <main className="has-sticky-footer">
       <Breadcrumbs
         items={[
           { href: "/", label: "НИАБ" },
@@ -129,17 +129,6 @@ export default async function PageView({ params }: Props) {
             label: `Дело ${caseNumber}`,
           },
         ]}
-        trailing={
-          <PagePager
-            prevHref={
-              prev ? pagePath(fund, inventory, caseNumber, prev) : null
-            }
-            nextHref={
-              next ? pagePath(fund, inventory, caseNumber, next) : null
-            }
-            currentLabel={`лл. ${pageNum} из ${total}`}
-          />
-        }
       />
       <h1>
         Фонд {fund}, опись {inventory}, дело {caseNumber}
@@ -192,6 +181,13 @@ export default async function PageView({ params }: Props) {
       pageRecords.deathsAlt.length === 0 ? (
         <p className="empty">На этой странице нет записей</p>
       ) : null}
+      <footer className="sticky-footer">
+        <PagePager
+          prevHref={prev ? pagePath(fund, inventory, caseNumber, prev) : null}
+          nextHref={next ? pagePath(fund, inventory, caseNumber, next) : null}
+          currentLabel={`лл. ${pageNum} из ${total}`}
+        />
+      </footer>
     </main>
   );
 }
