@@ -5,6 +5,11 @@ import {
   listCombinedFunds,
   listCombinedInventoriesForFund,
 } from "@/data/sources/records";
+import {
+  formatFundCrumb,
+  formatFundLabel,
+  getFundName,
+} from "@/data/sources/shared/fund-catalog";
 import { inventoryPath } from "@/data/sources/shared/paths";
 
 type Props = {
@@ -26,16 +31,24 @@ export default async function FundPage({ params }: Props) {
   }
 
   const inventories = await listCombinedInventoriesForFund(fund);
+  const label = formatFundLabel(fund);
+  const name = getFundName(fund);
 
   return (
     <main>
       <Breadcrumbs
         items={[
           { href: "/", label: "НИАБ" },
-          { label: `Фонд ${fund}` },
+          { label: formatFundCrumb(fund) },
         ]}
       />
-      <h1>Фонд {fund}</h1>
+      <h1>{label}</h1>
+      {name ? (
+        <p className="lead">
+          Фонд Национального исторического архива Беларуси (
+          {formatFundCrumb(fund)}): {name}.
+        </p>
+      ) : null}
       <h2>Описи</h2>
       <LinkList
         items={inventories.map((inventory) => ({

@@ -7,6 +7,10 @@ import {
   listCombinedInventoriesForFund,
   listCombinedPagesForCase,
 } from "@/data/sources/records";
+import {
+  formatFundCrumb,
+  formatFundLabel,
+} from "@/data/sources/shared/fund-catalog";
 import { fundPath, inventoryPath, pagePath } from "@/data/sources/shared/paths";
 
 type Props = {
@@ -56,19 +60,20 @@ export default async function CasePage({ params }: Props) {
   }
 
   const pages = await listCombinedPagesForCase(fund, inventory, caseNumber);
+  const fundLabel = formatFundLabel(fund);
 
   return (
     <main>
       <Breadcrumbs
         items={[
           { href: "/", label: "НИАБ" },
-          { href: fundPath(fund), label: `Фонд ${fund}` },
+          { href: fundPath(fund), label: formatFundCrumb(fund) },
           { href: inventoryPath(fund, inventory), label: `Опись ${inventory}` },
           { label: `Дело ${caseNumber}` },
         ]}
       />
       <h1>
-        Фонд {fund}, опись {inventory}, дело {caseNumber}
+        {fundLabel}, опись {inventory}, дело {caseNumber}
       </h1>
       <h2>Страницы</h2>
       <LinkList

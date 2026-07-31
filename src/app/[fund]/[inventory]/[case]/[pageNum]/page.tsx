@@ -16,6 +16,10 @@ import {
   listCombinedPagesForCase,
 } from "@/data/sources/records";
 import {
+  formatFundCrumb,
+  formatFundLabel,
+} from "@/data/sources/shared/fund-catalog";
+import {
   casePath,
   fundPath,
   inventoryPath,
@@ -116,13 +120,14 @@ export default async function PageView({ params }: Props) {
     caseNumber,
     pageNum,
   );
+  const fundLabel = formatFundLabel(fund);
 
   return (
     <main className="has-sticky-footer">
       <Breadcrumbs
         items={[
           { href: "/", label: "НИАБ" },
-          { href: fundPath(fund), label: `Фонд ${fund}` },
+          { href: fundPath(fund), label: formatFundCrumb(fund) },
           { href: inventoryPath(fund, inventory), label: `Опись ${inventory}` },
           {
             href: casePath(fund, inventory, caseNumber),
@@ -131,7 +136,7 @@ export default async function PageView({ params }: Props) {
         ]}
       />
       <h1>
-        Фонд {fund}, опись {inventory}, дело {caseNumber}
+        {fundLabel}, опись {inventory}, дело {caseNumber}
       </h1>
       {pageRecords.births.length > 0 || pageRecords.birthsExtra.length > 0 ? (
         <>
