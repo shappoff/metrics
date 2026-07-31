@@ -147,9 +147,10 @@ h2 {
 }
 
 .record {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
-  padding: 1rem;
+  padding: 1rem 2.5rem 1rem 1rem;
 }
 
 .record dl {
@@ -169,12 +170,73 @@ h2 {
   word-break: break-word;
 }
 
+.record-info {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
+.record-info-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.record-info-button:hover,
+.record-info-button[aria-expanded="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.record-info-tooltip {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  z-index: 5;
+  width: min(22rem, calc(100vw - 3rem));
+  padding: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.08);
+}
+
+.record-info-tooltip dl {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 8rem) 1fr;
+  gap: 0.3rem 0.75rem;
+  margin: 0;
+}
+
+.record-info-field {
+  display: contents;
+}
+
+.record-info-tooltip dt {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.record-info-tooltip dd {
+  margin: 0;
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+
 .empty {
   color: var(--muted);
 }
 
 @media (max-width: 640px) {
-  .record dl {
+  .record dl,
+  .record-info-tooltip dl {
     grid-template-columns: 1fr;
   }
 }
