@@ -1,28 +1,19 @@
-import { RecordInfoTooltip } from "./RecordInfoTooltip";
-
-type Column<TRecord extends Record<string, string>> = {
-  key: string;
-  label: string;
-  primary?: boolean;
-  getValue?: (record: TRecord) => string;
-};
+import type { VisibleColumn } from "@/data/sources/shared/visible-column";
+import {
+  RecordInfoTooltip,
+  type RecordInfoField,
+} from "./RecordInfoTooltip";
 
 type Props<TRecord extends Record<string, string>> = {
   records: TRecord[];
-  columns: ReadonlyArray<Column<TRecord>>;
+  columns: ReadonlyArray<VisibleColumn<TRecord>>;
   emptyText: string;
   getItemKey: (record: TRecord, index: number) => string;
 };
 
-type FieldItem = {
-  key: string;
-  label: string;
-  value: string;
-};
-
 function readColumnValue<TRecord extends Record<string, string>>(
   record: TRecord,
-  column: Column<TRecord>
+  column: VisibleColumn<TRecord>
 ): string {
   if (column.getValue) {
     return column.getValue(record);
@@ -31,23 +22,26 @@ function readColumnValue<TRecord extends Record<string, string>>(
   return record[column.key] ?? "";
 }
 
-function collectFields<TRecord extends Record<string, string>>(
+function splitFields<TRecord extends Record<string, string>>(
   record: TRecord,
-  columns: ReadonlyArray<Column<TRecord>>,
-  primary: boolean
-): FieldItem[] {
-  const fields: FieldItem[] = [];
+  columns: ReadonlyArray<VisibleColumn<TRecord>>
+): { primary: RecordInfoField[]; secondary: RecordInfoField[] } {
+  const primary: RecordInfoField[] = [];
+  const secondary: RecordInfoField[] = [];
 
   for (const column of columns) {
-    if (Boolean(column.primary) !== primary) continue;
-
     const value = readColumnValue(record, column);
     if (!value) continue;
 
-    fields.push({ key: column.key, label: column.label, value });
+    const field = { key: column.key, label: column.label, value };
+    if (column.primary) {
+      primary.push(field);
+    } else {
+      secondary.push(field);
+    }
   }
 
-  return fields;
+  return { primary, secondary };
 }
 
 export function RecordDetailsList<TRecord extends Record<string, string>>({
@@ -63,15 +57,14 @@ export function RecordDetailsList<TRecord extends Record<string, string>>({
   return (
     <div className="records">
       {records.map((record, index) => {
-        const primaryFields = collectFields(record, columns, true);
-        const secondaryFields = collectFields(record, columns, false);
+        const { primary, secondary } = splitFields(record, columns);
 
         return (
           <article className="record" key={getItemKey(record, index)}>
-            <RecordInfoTooltip fields={secondaryFields} />
+            <RecordInfoTooltip fields={secondary} />
             <dl>
-              {primaryFields.map((field) => (
-                <div key={field.key} style={{ display: "contents" }}>
+              {primary.map((field) => (
+                <div key={field.key} className="record-field">
                   <dt>{field.label}</dt>
                   <dd>{field.value}</dd>
                 </div>
