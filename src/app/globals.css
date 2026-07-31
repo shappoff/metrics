@@ -147,11 +147,9 @@ h2 {
 }
 
 .record {
-  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
   padding: 1rem;
-  padding-right: 2.75rem;
 }
 
 .record dl {
@@ -161,10 +159,6 @@ h2 {
   margin: 0;
 }
 
-.record-field {
-  display: contents;
-}
-
 .record dt {
   color: var(--muted);
   font-size: 0.85rem;
@@ -172,69 +166,6 @@ h2 {
 
 .record dd {
   margin: 0;
-  word-break: break-word;
-}
-
-.record-info {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  z-index: 2;
-}
-
-.record-info-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  padding: 0;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.record-info-button:hover,
-.record-info-button[aria-expanded="true"] {
-  color: var(--accent);
-  background: #f0ece4;
-}
-
-.record-info-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.record-info-tooltip {
-  position: absolute;
-  top: calc(100% + 0.35rem);
-  right: 0;
-  z-index: 20;
-  width: min(20rem, calc(100vw - 3rem));
-  padding: 0.75rem 0.9rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  box-shadow: 0 6px 20px rgba(26, 26, 26, 0.12);
-}
-
-.record-info-tooltip dl {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  margin: 0;
-}
-
-.record-info-field dt {
-  color: var(--muted);
-  font-size: 0.8rem;
-  margin-bottom: 0.15rem;
-}
-
-.record-info-field dd {
-  margin: 0;
-  font-size: 0.95rem;
   word-break: break-word;
 }
 

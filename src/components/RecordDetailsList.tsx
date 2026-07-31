@@ -1,15 +1,26 @@
-import {
-  collectFilledFields,
-  type VisibleColumn,
-} from "@/data/sources/shared/visible-column";
-import { RecordInfoTooltip } from "./RecordInfoTooltip";
+type Column<TRecord extends Record<string, string>> = {
+  key: string;
+  label: string;
+  getValue?: (record: TRecord) => string;
+};
 
 type Props<TRecord extends Record<string, string>> = {
   records: TRecord[];
-  columns: ReadonlyArray<VisibleColumn<TRecord>>;
+  columns: ReadonlyArray<Column<TRecord>>;
   emptyText: string;
   getItemKey: (record: TRecord, index: number) => string;
 };
+
+function readColumnValue<TRecord extends Record<string, string>>(
+  record: TRecord,
+  column: Column<TRecord>
+): string {
+  if (column.getValue) {
+    return column.getValue(record);
+  }
+
+  return record[column.key] ?? "";
+}
 
 export function RecordDetailsList<TRecord extends Record<string, string>>({
   records,
@@ -21,31 +32,25 @@ export function RecordDetailsList<TRecord extends Record<string, string>>({
     return <p className="empty">{emptyText}</p>;
   }
 
-  const mainColumns = columns.filter((column) => column.kind !== "info");
-  const infoColumns = columns.filter((column) => column.kind === "info");
-
   return (
     <div className="records">
-      {records.map((record, index) => {
-        const mainFields = collectFilledFields(record, mainColumns);
-        const infoFields = collectFilledFields(record, infoColumns);
+      {records.map((record, index) => (
+        <article className="record" key={getItemKey(record, index)}>
+          <dl>
+            {columns.map((column) => {
+              const value = readColumnValue(record, column);
+              if (!value) return null;
 
-        return (
-          <article className="record" key={getItemKey(record, index)}>
-            {infoFields.length > 0 ? (
-              <RecordInfoTooltip fields={infoFields} />
-            ) : null}
-            <dl>
-              {mainFields.map((field) => (
-                <div key={field.key} className="record-field">
-                  <dt>{field.label}</dt>
-                  <dd>{field.value}</dd>
+              return (
+                <div key={column.key} style={{ display: "contents" }}>
+                  <dt>{column.label}</dt>
+                  <dd>{value}</dd>
                 </div>
-              ))}
-            </dl>
-          </article>
-        );
-      })}
+              );
+            })}
+          </dl>
+        </article>
+      ))}
     </div>
   );
 }

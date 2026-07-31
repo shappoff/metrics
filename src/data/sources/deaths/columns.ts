@@ -19,10 +19,10 @@ export const DEATH_VISIBLE_COLUMNS = [
   }),
   { key: "name", label: "Имя" },
   { key: "age", label: "Возраст" },
-  { key: "name_note", label: "Примечание (имя)", kind: "info" },
+  { key: "name_note", label: "Примечание (имя)" },
   { key: "reason", label: "Причина" },
   { key: "buried_place", label: "Место погребения" },
-  { key: "notes", label: "Примечания", kind: "info" },
+  { key: "notes", label: "Примечания" },
   { key: "priest", label: "Священник" },
   { key: "church", label: "Церковь" },
 ] as const satisfies ReadonlyArray<VisibleColumn<DeathRecord>>;

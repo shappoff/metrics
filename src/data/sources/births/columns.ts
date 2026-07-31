@@ -19,10 +19,10 @@ export const BIRTH_VISIBLE_COLUMNS = [
   }),
   { key: "name", label: "Имя" },
   { key: "parents", label: "Родители" },
-  { key: "parents_note", label: "Примечание (родители)", kind: "info" },
+  { key: "parents_note", label: "Примечание (родители)" },
   { key: "godparents", label: "Крёстные" },
-  { key: "godparents_note", label: "Примечание (крёстные)", kind: "info" },
-  { key: "notes", label: "Примечания", kind: "info" },
+  { key: "godparents_note", label: "Примечание (крёстные)" },
+  { key: "notes", label: "Примечания" },
   { key: "priest", label: "Священник" },
   { key: "church", label: "Церковь" },
 ] as const satisfies ReadonlyArray<VisibleColumn<BirthRecord>>;
