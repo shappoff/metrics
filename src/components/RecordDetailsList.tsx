@@ -58,9 +58,14 @@ export function RecordDetailsList<TRecord extends Record<string, string>>({
     <div className="records">
       {records.map((record, index) => {
         const { primary, secondary } = splitFields(record, columns);
+        const cols = Math.min(Math.max(primary.length, 1), 4);
 
         return (
-          <article className="record" key={getItemKey(record, index)}>
+          <article
+            className="record"
+            data-cols={cols}
+            key={getItemKey(record, index)}
+          >
             <RecordInfoTooltip fields={secondary} />
             <dl>
               {primary.map((field) => (
