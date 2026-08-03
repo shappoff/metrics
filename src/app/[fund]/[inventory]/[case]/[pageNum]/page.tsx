@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { BirthRecords } from "@/components/BirthRecords";
 import { BirthExtraRecords } from "@/components/BirthExtraRecords";
+import { BirthAltRecords } from "@/components/BirthAltRecords";
 import { DeathAltRecords } from "@/components/DeathAltRecords";
 import { DeathRecords } from "@/components/DeathRecords";
 import { MarriageRecords } from "@/components/MarriageRecords";
@@ -138,7 +139,9 @@ export default async function PageView({ params }: Props) {
       <h1>
         {fundLabel}, опись {inventory}, дело {caseNumber}
       </h1>
-      {pageRecords.births.length > 0 || pageRecords.birthsExtra.length > 0 ? (
+      {pageRecords.births.length > 0 ||
+      pageRecords.birthsExtra.length > 0 ||
+      pageRecords.birthsAlt.length > 0 ? (
         <>
           <h2>Рождения</h2>
           {pageRecords.births.length > 0 ? (
@@ -146,6 +149,9 @@ export default async function PageView({ params }: Props) {
           ) : null}
           {pageRecords.birthsExtra.length > 0 ? (
             <BirthExtraRecords records={pageRecords.birthsExtra} />
+          ) : null}
+          {pageRecords.birthsAlt.length > 0 ? (
+            <BirthAltRecords records={pageRecords.birthsAlt} />
           ) : null}
         </>
       ) : null}
@@ -180,6 +186,7 @@ export default async function PageView({ params }: Props) {
       ) : null}
       {pageRecords.births.length === 0 &&
       pageRecords.birthsExtra.length === 0 &&
+      pageRecords.birthsAlt.length === 0 &&
       pageRecords.marriages.length === 0 &&
       pageRecords.marriagesAlt.length === 0 &&
       pageRecords.deaths.length === 0 &&

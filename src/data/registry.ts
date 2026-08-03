@@ -6,7 +6,7 @@ import { deathsConfig } from "@/data/sources/deaths";
 import { parseDeathRows } from "./sources/deaths/parse";
 import type { DeathRecord } from "@/data/sources/deaths";
 import { deathsAltConfig } from "@/data/sources/deaths_alt";
-import { parseDeathAltRows } from "./sources/deaths_alt/parse";
+import { parseDeathAltRows } from "@/data/sources/deaths_alt";
 import type { DeathAltRecord } from "@/data/sources/deaths_alt";
 import { marriagesConfig } from "@/data/sources/marriages";
 import { parseMarriageRows } from "./sources/marriages/parse";
@@ -17,6 +17,9 @@ import type { MarriageAltRecord } from "@/data/sources/marriages_alt";
 import { birthsExtraConfig } from "@/data/sources/births_extra";
 import { parseBirthExtraRows } from "@/data/sources/births_extra";
 import type { BirthExtraRecord } from "@/data/sources/births_extra";
+import { birthsAltConfig } from "@/data/sources/births_alt";
+import { parseBirthAltRows } from "@/data/sources/births_alt";
+import type { BirthAltRecord } from "@/data/sources/births_alt";
 
 export type DataSource<TRow> = {
   id: string;
@@ -74,10 +77,19 @@ export const birthsExtraSource: DataSource<BirthExtraRecord> = {
   parseRows: parseBirthExtraRows,
 };
 
+export const birthsAltSource: DataSource<BirthAltRecord> = {
+  id: birthsAltConfig.id,
+  title: birthsAltConfig.title,
+  spreadsheetId: birthsAltConfig.spreadsheetId,
+  sheetName: birthsAltConfig.sheetName,
+  parseRows: parseBirthAltRows,
+};
+
 /** Registry of all sheet sources. Add a new source here when extending. */
 export const dataSources = [
   birthsSource,
   birthsExtraSource,
+  birthsAltSource,
   marriagesSource,
   marriagesAltSource,
   deathsSource,
