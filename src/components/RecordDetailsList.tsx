@@ -3,12 +3,17 @@ import {
   RecordInfoTooltip,
   type RecordInfoField,
 } from "./RecordInfoTooltip";
+import { isPairedNoteKey, pairedNoteKey } from "./record-field-notes";
 
 type Props<TRecord extends Record<string, string>> = {
   records: TRecord[];
   columns: ReadonlyArray<VisibleColumn<TRecord>>;
   emptyText: string;
   getItemKey: (record: TRecord, index: number) => string;
+};
+
+type RecordPrimaryField = RecordInfoField & {
+  note?: string;
 };
 
 function readColumnValue<TRecord extends Record<string, string>>(
@@ -25,20 +30,40 @@ function readColumnValue<TRecord extends Record<string, string>>(
 function splitFields<TRecord extends Record<string, string>>(
   record: TRecord,
   columns: ReadonlyArray<VisibleColumn<TRecord>>
-): { primary: RecordInfoField[]; secondary: RecordInfoField[] } {
-  const primary: RecordInfoField[] = [];
+): { primary: RecordPrimaryField[]; secondary: RecordInfoField[] } {
+  const columnKeys = new Set(columns.map((column) => column.key));
+  const valuesByKey = new Map<string, string>();
+
+  for (const column of columns) {
+    valuesByKey.set(column.key, readColumnValue(record, column));
+  }
+
+  const primary: RecordPrimaryField[] = [];
   const secondary: RecordInfoField[] = [];
 
   for (const column of columns) {
-    const value = readColumnValue(record, column);
+    const value = valuesByKey.get(column.key) ?? "";
+
+    if (column.primary) {
+      const note = valuesByKey.get(pairedNoteKey(column.key)) ?? "";
+      if (!value && !note) continue;
+
+      primary.push({
+        key: column.key,
+        label: column.label,
+        value,
+        ...(note ? { note } : {}),
+      });
+      continue;
+    }
+
+    if (isPairedNoteKey(column.key, columnKeys)) {
+      continue;
+    }
+
     if (!value) continue;
 
-    const field = { key: column.key, label: column.label, value };
-    if (column.primary) {
-      primary.push(field);
-    } else {
-      secondary.push(field);
-    }
+    secondary.push({ key: column.key, label: column.label, value });
   }
 
   return { primary, secondary };
@@ -71,7 +96,12 @@ export function RecordDetailsList<TRecord extends Record<string, string>>({
               {primary.map((field) => (
                 <div key={field.key} className="record-field">
                   <dt>{field.label}</dt>
-                  <dd>{field.value}</dd>
+                  <dd>
+                    {field.value}
+                    {field.note ? (
+                      <span className="record-field-note">{field.note}</span>
+                    ) : null}
+                  </dd>
                 </div>
               ))}
             </dl>

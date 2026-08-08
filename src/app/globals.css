@@ -200,6 +200,14 @@ main.has-sticky-footer {
   word-break: break-word;
 }
 
+.record-field-note {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.85em;
+  line-height: 1.35;
+}
+
 .record-info {
   position: absolute;
   top: 0.75rem;
