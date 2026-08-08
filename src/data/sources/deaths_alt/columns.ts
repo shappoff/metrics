@@ -1,4 +1,5 @@
 import type { DeathAltRecord } from "./schema";
+import { CHURCH_COLUMN } from "../shared/church-column";
 import { CIPHER_COLUMN } from "../shared/cipher-column";
 import type { VisibleColumn } from "../shared/visible-column";
 
@@ -15,5 +16,5 @@ export const DEATH_ALT_VISIBLE_COLUMNS = [
   { key: "where", label: "Где", primary: true },
   { key: "where_note", label: "Примечание (где)" },
   { key: "notes", label: "Примечания" },
-  { key: "church", label: "Церковь" },
+  CHURCH_COLUMN,
 ] as const satisfies ReadonlyArray<VisibleColumn<DeathAltRecord>>;

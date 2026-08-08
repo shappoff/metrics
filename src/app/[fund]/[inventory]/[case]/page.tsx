@@ -1,12 +1,18 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { LinkList } from "@/components/LinkList";
 import {
   listCombinedCasesForInventory,
+  listCombinedChurchesForCase,
   listCombinedFunds,
   listCombinedInventoriesForFund,
   listCombinedPagesForCase,
 } from "@/data/sources/records";
+import {
+  formatCaseDescription,
+  formatCaseDocumentTitle,
+} from "@/data/sources/shared/case-title";
 import {
   formatFundCrumb,
   formatFundLabel,
@@ -32,6 +38,28 @@ export async function generateStaticParams() {
   }
 
   return params;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const {
+    fund: fundParam,
+    inventory: inventoryParam,
+    case: caseParam,
+  } = await params;
+  const fund = decodeURIComponent(fundParam);
+  const inventory = decodeURIComponent(inventoryParam);
+  const caseNumber = decodeURIComponent(caseParam);
+  const churches = await listCombinedChurchesForCase(
+    fund,
+    inventory,
+    caseNumber,
+  );
+  const fundLabel = formatFundLabel(fund);
+
+  return {
+    title: formatCaseDocumentTitle(fundLabel, inventory, caseNumber, churches),
+    description: formatCaseDescription(fund, inventory, caseNumber, churches),
+  };
 }
 
 export default async function CasePage({ params }: Props) {
@@ -60,6 +88,11 @@ export default async function CasePage({ params }: Props) {
   }
 
   const pages = await listCombinedPagesForCase(fund, inventory, caseNumber);
+  const churches = await listCombinedChurchesForCase(
+    fund,
+    inventory,
+    caseNumber,
+  );
   const fundLabel = formatFundLabel(fund);
 
   return (
@@ -73,7 +106,7 @@ export default async function CasePage({ params }: Props) {
         ]}
       />
       <h1>
-        {fundLabel}, опись {inventory}, дело {caseNumber}
+        {formatCaseDocumentTitle(fundLabel, inventory, caseNumber, churches)}
       </h1>
       <h2>Страницы</h2>
       <LinkList

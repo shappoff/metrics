@@ -1,4 +1,5 @@
 import type { BirthRecord } from "./schema";
+import { CHURCH_COLUMN } from "../shared/church-column";
 import { CIPHER_COLUMN } from "../shared/cipher-column";
 import { archiveDateColumn } from "../shared/date-column";
 import type { VisibleColumn } from "../shared/visible-column";
@@ -24,7 +25,7 @@ export const BIRTH_VISIBLE_COLUMNS = [
   { key: "godparents_note", label: "Примечание (крёстные)" },
   { key: "notes", label: "Примечания" },
   { key: "priest", label: "Священник" },
-  { key: "church", label: "Церковь" },
+  CHURCH_COLUMN,
 ] as const satisfies ReadonlyArray<VisibleColumn<BirthRecord>>;
 
 export type BirthVisibleColumnKey =

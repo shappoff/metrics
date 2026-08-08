@@ -2,10 +2,11 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { LinkList } from "@/components/LinkList";
 import {
-  listCombinedCasesForInventory,
+  listCombinedCasesWithChurches,
   listCombinedFunds,
   listCombinedInventoriesForFund,
 } from "@/data/sources/records";
+import { formatCaseLabel } from "@/data/sources/shared/case-title";
 import {
   formatFundCrumb,
   formatFundLabel,
@@ -45,7 +46,7 @@ export default async function InventoryPage({ params }: Props) {
     notFound();
   }
 
-  const cases = await listCombinedCasesForInventory(fund, inventory);
+  const cases = await listCombinedCasesWithChurches(fund, inventory);
   const fundLabel = formatFundLabel(fund);
 
   return (
@@ -62,9 +63,9 @@ export default async function InventoryPage({ params }: Props) {
       </h1>
       <h2>Дела</h2>
       <LinkList
-        items={cases.map((caseNumber) => ({
+        items={cases.map(({ caseNumber, churches }) => ({
           href: casePath(fund, inventory, caseNumber),
-          label: `Дело ${caseNumber}`,
+          label: formatCaseLabel(caseNumber, churches),
         }))}
         emptyText="В этой описи нет дел"
       />

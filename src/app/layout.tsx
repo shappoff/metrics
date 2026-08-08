@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Метрические книги",
+  title: {
+    default: "Метрические книги",
+    template: "%s | Метрические книги",
+  },
   description: "Данные из метрических книг, загруженные из Google Sheets",
 };
 

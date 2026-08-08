@@ -1,4 +1,5 @@
 import type { MarriageAltRecord } from "./schema";
+import { CHURCH_COLUMN } from "../shared/church-column";
 import { CIPHER_COLUMN } from "../shared/cipher-column";
 import type { VisibleColumn } from "../shared/visible-column";
 
@@ -13,5 +14,5 @@ export const MARRIAGES_ALT_VISIBLE_COLUMNS = [
   { key: "trustees", label: "Поручители", primary: true },
   { key: "trustees_note", label: "Примечание (поручители)" },
   { key: "notes", label: "Примечания" },
-  { key: "church", label: "Церковь" },
+  CHURCH_COLUMN,
 ] as const satisfies ReadonlyArray<VisibleColumn<MarriageAltRecord>>;

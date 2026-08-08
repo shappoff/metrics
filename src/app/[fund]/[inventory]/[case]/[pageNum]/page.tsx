@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { BirthRecords } from "@/components/BirthRecords";
@@ -12,10 +13,15 @@ import {
   getCombinedAdjacentPages,
   getCombinedPageRecords,
   listCombinedCasesForInventory,
+  listCombinedChurchesForCase,
   listCombinedFunds,
   listCombinedInventoriesForFund,
   listCombinedPagesForCase,
 } from "@/data/sources/records";
+import {
+  formatCaseDescription,
+  formatCaseDocumentTitle,
+} from "@/data/sources/shared/case-title";
 import {
   formatFundCrumb,
   formatFundLabel,
@@ -65,6 +71,36 @@ export async function generateStaticParams() {
   }
 
   return params;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const {
+    fund: fundParam,
+    inventory: inventoryParam,
+    case: caseParam,
+    pageNum: pageParam,
+  } = await params;
+  const fund = decodeURIComponent(fundParam);
+  const inventory = decodeURIComponent(inventoryParam);
+  const caseNumber = decodeURIComponent(caseParam);
+  const pageNum = normalizePageRouteSegment(decodeURIComponent(pageParam));
+  const churches = await listCombinedChurchesForCase(
+    fund,
+    inventory,
+    caseNumber,
+  );
+  const fundLabel = formatFundLabel(fund);
+  const caseTitle = formatCaseDocumentTitle(
+    fundLabel,
+    inventory,
+    caseNumber,
+    churches,
+  );
+
+  return {
+    title: `${caseTitle}, лл. ${pageNum}`,
+    description: formatCaseDescription(fund, inventory, caseNumber, churches),
+  };
 }
 
 export default async function PageView({ params }: Props) {
@@ -121,6 +157,11 @@ export default async function PageView({ params }: Props) {
     caseNumber,
     pageNum,
   );
+  const churches = await listCombinedChurchesForCase(
+    fund,
+    inventory,
+    caseNumber,
+  );
   const fundLabel = formatFundLabel(fund);
 
   return (
@@ -137,7 +178,7 @@ export default async function PageView({ params }: Props) {
         ]}
       />
       <h1>
-        {fundLabel}, опись {inventory}, дело {caseNumber}
+        {formatCaseDocumentTitle(fundLabel, inventory, caseNumber, churches)}
       </h1>
       {pageRecords.births.length > 0 ||
       pageRecords.birthsExtra.length > 0 ||

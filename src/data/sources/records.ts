@@ -18,6 +18,14 @@ import {
   loadBirthAltRecords,
 } from "@/data/sources/births_alt";
 import {
+  collectChurchesWithYears,
+  type ChurchWithYears,
+} from "./shared/case-title";
+import {
+  extractYearsFromTexts,
+  parseYearField,
+} from "./shared/format-years";
+import {
   getAdjacentPages,
   listCasesForInventory,
   listFunds,
@@ -169,6 +177,24 @@ function compareNatural(a: string, b: string): number {
   return a.localeCompare(b, "ru", { numeric: true, sensitivity: "base" });
 }
 
+function yearsForScopedRecord(entry: ScopedRecord): number[] {
+  switch (entry.source) {
+    case "births":
+    case "deaths":
+    case "marriages": {
+      const year = parseYearField(entry.record.year);
+      return year == null ? [] : [year];
+    }
+    case "births_alt":
+    case "births_extra":
+      return extractYearsFromTexts(entry.record.born, entry.record.baptism);
+    case "deaths_alt":
+      return extractYearsFromTexts(entry.record.died, entry.record.buried);
+    case "marriages_alt":
+      return extractYearsFromTexts(entry.record.date);
+  }
+}
+
 export async function loadCombinedRecords(): Promise<CombinedRecords> {
   if (cachedCombined) return cachedCombined;
   if (loadPromise) return loadPromise;
@@ -236,6 +262,66 @@ export async function listCombinedCasesForInventory(
 ): Promise<string[]> {
   const { scoped } = await loadCombinedRecords();
   return listCasesForInventory(scoped, fund, inventory);
+}
+
+export type CaseWithChurches = {
+  caseNumber: string;
+  churches: ChurchWithYears[];
+};
+
+/** One pass over an inventory: cases with churches and years from all sources. */
+export async function listCombinedCasesWithChurches(
+  fund: string,
+  inventory: string,
+): Promise<CaseWithChurches[]> {
+  const { scoped } = await loadCombinedRecords();
+  const byCase = new Map<string, Array<{ church: string; years: number[] }>>();
+
+  for (const entry of scoped) {
+    if (entry.fund !== fund || entry.inventory !== inventory) continue;
+    const item = {
+      church: entry.record.church,
+      years: yearsForScopedRecord(entry),
+    };
+    const list = byCase.get(entry.caseNumber);
+    if (list) {
+      list.push(item);
+    } else {
+      byCase.set(entry.caseNumber, [item]);
+    }
+  }
+
+  return [...byCase.entries()]
+    .map(([caseNumber, entries]) => ({
+      caseNumber,
+      churches: collectChurchesWithYears(entries),
+    }))
+    .sort((a, b) => compareNatural(a.caseNumber, b.caseNumber));
+}
+
+export async function listCombinedChurchesForCase(
+  fund: string,
+  inventory: string,
+  caseNumber: string,
+): Promise<ChurchWithYears[]> {
+  const { scoped } = await loadCombinedRecords();
+  const entries: Array<{ church: string; years: number[] }> = [];
+
+  for (const entry of scoped) {
+    if (
+      entry.fund !== fund ||
+      entry.inventory !== inventory ||
+      entry.caseNumber !== caseNumber
+    ) {
+      continue;
+    }
+    entries.push({
+      church: entry.record.church,
+      years: yearsForScopedRecord(entry),
+    });
+  }
+
+  return collectChurchesWithYears(entries);
 }
 
 export async function listCombinedPagesForCase(
